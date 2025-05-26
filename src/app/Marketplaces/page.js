@@ -9,6 +9,7 @@ import { Star } from "lucide-react";
 import PaymentButton from "../Details/PaymentButton";
 import StripeWrapper from "../Details/StripeWrapper";
 import axios from "axios";
+import { useSearchParams } from 'next/navigation';
 
 const Marketplaces = () => {
   const { isSidebarOpen } = useSidebarStore();
@@ -38,6 +39,8 @@ const Marketplaces = () => {
   const staticUserId = currentUser?.state?.user?._id;
   const token = localStorage.getItem("token");
   const sellerName = currentUser?.state?.user?.username;
+   const searchParams = useSearchParams();
+    const _id = searchParams.get('id');
   const categoryOptions = [
     "Tools", "Furniture", "Household", "Garden", "Appliances", "Entertainment",
     "Video Games", "Books, Films, Music", "Luggage", "Women's Dressing", "Men's Dressing",
@@ -49,9 +52,9 @@ const Marketplaces = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch("https://fb-backend.vercel.app/MarketPlace/marketplace");
+        const response = await fetch(`https://fb-backend.vercel.app/MarketPlace/ListingsBySellerId/${_id}`);
         const data = await response.json();
-        console.log("Fetched data:", data);
+        console.log("Fetched data:12", data);
         if (data.status === "success") {
           setPosts(data.data);
         }

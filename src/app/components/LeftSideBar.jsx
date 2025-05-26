@@ -175,7 +175,7 @@ const LeftSideBar = () => {
 
   return (
     <aside
-      className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-80 p-4 transform transition-transform duration-200 ease-in-out md:translate-x-0 flex flex-col z-50 ${
+      className={`fixed top-16 left-0  w-80 p-4 transform transition-transform duration-200 ease-in-out md:translate-x-0 flex flex-col z-50 ${
         isSidebarOpen
           ? "translate-x-0 bg-white dark:bg-[rgb(36,37,38)] shadow-lg"
           : "-translate-x-full"
@@ -202,7 +202,7 @@ const LeftSideBar = () => {
 {pathname !== "/Chatpage" && (
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 w-full mt-5">
         <h3 className="text-lg font-semibold mb-4">Online Connections</h3>
-        <ul className="space-y-2 overflow-y-auto max-h-[300px]">
+        <ul className="space-y-2 overflow-y-auto max-h-[600px]">
           {userList.map((userItem) => (
             <li
               key={userItem._id}

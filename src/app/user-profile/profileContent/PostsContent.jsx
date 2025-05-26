@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import PostComments from '@/app/posts/PostComments';
 import { formateDate } from '@/lib/utils';
+import Image from 'next/image';
 
 const PostsContent = ({post,isLiked,onShare,onComment,onLike}) => {
     const [showComments,setShowComments] = useState(false)
@@ -83,7 +84,7 @@ const PostsContent = ({post,isLiked,onShare,onComment,onLike}) => {
              </div>
              <p className='mb-4'>{post?.content}</p>
              {post?.mediaUrl && post.mediaType === 'image' && (
-                <img
+                <Image 
                   src={post?.mediaUrl}
                   alt='post_image'
                   className='w-full h-auto rounded-lg mb-4'

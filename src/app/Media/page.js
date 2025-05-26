@@ -9,12 +9,35 @@ import toast from "react-hot-toast";
 import { Send } from 'lucide-react';
 import LeftSideBar from "./CreateGroupPage ";
 import CreateGroupPage from "./CreateGroupPage ";
-
-const Media = () => {
+import { useSearchParams } from 'next/navigation';
+import axiosInstance from "../../service/url.service"
+ const Media = () => {
   const [isPostFormOpen, setIsPostFormOpen] = useState(false);
   const [likePosts,setLikePosts] = useState(new Set());
   const {posts,fetchPost,handleLikePost,handleCommentPost,handleSharePost} = usePostStore();
   const [groups, setGroups] = useState([]);
+  const [posts1, setposts1] = useState([]);
+
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+  const media = searchParams.get('media');
+
+  console.log('________Media:', media); // video
+  console.log('Fetched posts:___________MediaID:', posts); 
+    useEffect(() => {
+      
+    const fetchPosts = async () => {
+      try {
+        const response = await axiosInstance.get(`/postRoute/posts/user/${id}?media=${media}`);
+        console.log("Fetched posts:___", response.data.data);
+        setposts1(response.data.data)
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
 console.log(groups,'groups_________1')
 console.log(posts,'groups_________1posts')
@@ -68,8 +91,9 @@ console.log(posts,'groups_________1posts')
         />
     {/* Gallery Section */}
 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8">
-  {posts
-    .filter((post) => post.mediaUrl) // only posts with media
+{(media !== null && media !== '') ? (
+  posts1
+    .filter((post) => post.mediaUrl) // show only posts with media
     .map((post) => (
       <div key={post._id} className="rounded overflow-hidden shadow-md">
         {post.mediaType === "image" ? (
@@ -86,7 +110,27 @@ console.log(posts,'groups_________1posts')
           />
         ) : null}
       </div>
-    ))}
+    ))
+) : (
+  posts.map((post) => (
+    <div key={post._id} className="rounded overflow-hidden shadow-md">
+      {post.mediaType === "image" ? (
+        <img
+          src={post.mediaUrl}
+          alt={post.content}
+          className="w-full h-48 object-cover"
+        />
+      ) : post.mediaType === "video" ? (
+        <video
+          controls
+          className="w-full h-48 object-cover"
+          src={post.mediaUrl}
+        />
+      ) : null}
+    </div>
+  ))
+)}
+
 </div>
 
       </div>

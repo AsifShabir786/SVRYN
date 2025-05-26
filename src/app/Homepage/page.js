@@ -11,17 +11,59 @@ import toast from "react-hot-toast";
 import { Send } from "lucide-react";
 import useSidebarStore from "@/store/sidebarStore";
  import { useParams } from "next/navigation";
+ import Link from 'next/link';
+
 import { fetchUserProfile } from "@/service/user.service";
 import ProfileHeader from "../user-profile/ProfileHeader";
 import ProfileTabs from "../user-profile/ProfileTabs";
+import axiosInstance from "@/service/url.service";
 const HomePage = () => {
   const [isPostFormOpen, setIsPostFormOpen] = useState(false);
+  const [refresh, setrefresh] = useState(false);
+
   const [likePosts, setLikePosts] = useState(new Set());
   const { posts, fetchPost, handleLikePost, handleCommentPost, handleSharePost } = usePostStore();
   const { isSidebarOpen } = useSidebarStore(); // Use sidebar store
 const user = JSON.parse(localStorage.getItem("user-storage") || '{}');
  console.log(user?.state?.user?._id, 'user_____1');
     const id = user?.state?.user?._id
+      const [posts1, setposts1] = useState([]);
+const [post, setPost] = useState(null); // only 1 item, not an array
+
+useEffect(() => {
+  const fetchListings = async () => {
+    try {
+      const response = await fetch("https://fb-backend.vercel.app/MarketPlace/marketplace");
+      const data = await response.json();
+      console.log("Fetched posts:___12", data.data);
+
+      if (data.status === "success" && data.data.length > 0) {
+        setPost(data.data[0]); // only first index
+      }
+    } catch (err) {
+      console.error("Error fetching listings:", err);
+      setMessage("❌ Failed to fetch listings");
+    }
+  };
+
+  fetchListings();
+}, [refresh]);
+
+      console.log('Fetched posts:___________MediaID:', posts); 
+        useEffect(() => {
+        const fetchPosts = async () => {
+          try {
+            const response = await axiosInstance.get(`/postRoute/posts/user/${id}?media=${'video'}`);
+            console.log("Fetched posts:___11", response.data.data);
+            setposts1(response.data.data)
+          } catch (error) {
+            console.error("Error fetching posts:", error);
+          }
+        };
+    
+        fetchPosts();
+      }, [refresh]);
+    
    const [profileData, setProfileData] = useState(null);
    console.log(profileData,'profileData_____-')
    const [loading, setLoading] = useState(false);
@@ -145,18 +187,22 @@ const user = JSON.parse(localStorage.getItem("user-storage") || '{}');
       {/* Follower Stats - Moved outside the profile info container */}
       <div className="w-full bg-gray-50 py-2 px-4 border-t border-b border-gray-200">
         <div className="flex items-center space-x-4 ml-28 text-sm">
-          <div className="font-medium">1k Follows</div>
+          <div className="font-medium">{profileData.followerCount} Follows</div>
           <div className="h-4 w-px bg-gray-300"></div>
-          <div className="font-medium">230 Following</div>
+          <div className="font-medium">{profileData.followingCount} Following</div>
         </div>
       </div>
 
       {/* Gallery Section */}
       <div className="grid grid-cols-3 gap-2 p-4">
         {/* Card 1 */}
+          <Link
+       href={`/Marketplaces?id=${id}`}
+      className="flex flex-col cursor-pointer"
+    >
         <div className="flex flex-col">
           <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwURDvYBUHfSuRIaq-x-MaalRG8Hcr0HwH4g&s?height=200&width=200" alt="RSVP Shop" className="w-full h-full object-cover" />
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgxYUIMs1xNBhE7fKNtPXTIogB3cW9zAyLcQ&s" alt="RSVP Shop" className="w-full h-full object-cover" />
           </div>
           <p className="text-xs mt-1 text-center">
             Visit {profileData.firstName}'s
@@ -164,21 +210,52 @@ const user = JSON.parse(localStorage.getItem("user-storage") || '{}');
             RSVP Shop
           </p>
         </div>
-
+</Link>
         {/* Card 2 */}
-        <div className="flex flex-col">
-          <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
-            <img src="https://thumbs.dreamstime.com/b/no-image-available-icon-flat-vector-no-image-available-icon-flat-vector-illustration-132482953.jpg?height=200&width=200" alt="Shoes" className="w-full h-full object-cover" />
-          </div>
-          <p className="text-xs mt-1 text-center">
-            View {profileData.firstName}'s
-            <br />
-            Shoes
-          </p>
-        </div>
+       <div className="flex flex-col">
+  <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
+    <img
+      src={post?.imageUrl?.[0] || "https://thumbs.dreamstime.com/b/no-image-available-icon-flat-vector-no-image-available-icon-flat-vector-illustration-132482953.jpg?height=200&width=200"}
+      alt="Shoes"
+      className="w-full h-full object-cover"
+    />
+  </div>
+  <p className="text-xs mt-1 text-center">
+    View {profileData?.firstName}'s
+    <br />
+    Shoes
+  </p>
+</div>
+
+{posts1
+  // .filter((post) => post.mediaType === 'video')
+  .map((post) => (
+    <Link
+      key={post._id}
+      href={`/Media?media=video&id=${id}`}
+      className="flex flex-col cursor-pointer"
+    >
+      <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
+      <video
+  src={post.mediaUrl}
+  muted
+  loop
+  playsInline
+  className="w-full h-full object-cover"
+/>
+
+      </div>
+      <p className="text-xs mt-1 text-center">
+        View {profileData.firstName}'s
+        <br />
+        Videos
+      </p>
+    </Link>
+))}
+
 
         {/* Card 3 */}
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
             <img src="https://i.ytimg.com/vi/UH1ThWZ9hXU/hqdefault.jpg?height=200&width=200" alt="Videos" className="w-full h-full object-cover" />
           </div>
@@ -187,7 +264,7 @@ const user = JSON.parse(localStorage.getItem("user-storage") || '{}');
             <br />
             Videos
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
             <StorySection />

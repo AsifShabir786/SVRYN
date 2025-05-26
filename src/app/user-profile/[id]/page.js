@@ -29,7 +29,7 @@ const Page = () => {
     if (id) {
       fetchProfile();
     }
-  }, [id]);
+  }, [id,fetchProfile]);
 
   if (!profileData) {
     return <div>Loading...</div>;
