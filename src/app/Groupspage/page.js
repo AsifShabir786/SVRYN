@@ -10,6 +10,7 @@ import { Send, Trash2 } from 'lucide-react';
 import useSidebarStore from "@/store/sidebarStore";
 import LeftSideBar from "../components/LeftSideBar";
 import axios from 'axios';
+import Image from 'next/image';
 
 const Groupspage = () => {
   const [isPostFormOpen, setIsPostFormOpen] = useState(false);
@@ -46,7 +47,7 @@ const Groupspage = () => {
 
   useEffect(() => {
     fetchGroups();
-  }, []);
+  }, [fetchGroups]);
 
   const fetchGroups = async () => {
     try {
@@ -180,7 +181,7 @@ const Groupspage = () => {
   const GroupCard = ({ group, isDiscoverTab = false }) => (
     <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <img
+        <Image 
           src={group.admin.profilePicture || '/default-group.png'}
           alt={group.name}
           className="w-16 h-16 rounded-full object-cover"
@@ -383,7 +384,7 @@ const Groupspage = () => {
                   </div>
 
                   <div className="mb-4">
-                    <img
+                    <Image 
                       src={selectedGroup.admin.profilePicture || '/default-group.png'}
                       alt={selectedGroup.name}
                       className="w-full h-48 rounded-lg object-cover mb-4"
@@ -429,7 +430,7 @@ const Groupspage = () => {
                     <GroupCard key={group._id} group={group} isDiscoverTab={false} />
                   ))
                 ) : (
-                  <p className="text-gray-600">You haven't joined any groups yet.</p>
+                  <p className="text-gray-600">You haven&apos;t joined any groups yet.</p>
                 )
               ) : (
                 filteredPosts().map((post) => (
