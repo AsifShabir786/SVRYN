@@ -6,11 +6,11 @@ import NewPostForm from "../posts/NewPostForm";
 import PostCard from "../posts/PostCard";
 import { usePostStore } from "@/store/usePostStore";
 import toast from "react-hot-toast";
-import { Send, Trash2 } from 'lucide-react';
+import { Send, Trash2 } from "lucide-react";
 import useSidebarStore from "@/store/sidebarStore";
 import LeftSideBar from "../components/LeftSideBar";
-import axios from 'axios';
-import Image from 'next/image';
+import axios from "axios";
+import Image from "next/image";
 
 const Groupspage = () => {
   const [isPostFormOpen, setIsPostFormOpen] = useState(false);
@@ -18,17 +18,17 @@ const Groupspage = () => {
   const { posts, fetchPost, handleLikePost, handleCommentPost, handleSharePost } = usePostStore();
   const [groups, setGroups] = useState([]);
   const { isSidebarOpen } = useSidebarStore();
-  const [activeTab, setActiveTab] = useState('Your feed');
+  const [activeTab, setActiveTab] = useState("Your feed");
   const token = localStorage.getItem("token");
-  const currentUser = JSON.parse(localStorage.getItem('user-storage'));
+  const currentUser = JSON.parse(localStorage.getItem("user-storage"));
   const staticUserId = currentUser?.state?.user?._id;
 
   // State for the Create Group modal
   const [showModal, setShowModal] = useState(false);
-  const [groupName, setGroupName] = useState('');
-  const [description, setDescription] = useState('');
-  const [privacy, setPrivacy] = useState('Public');
-  const [message, setMessage] = useState('');
+  const [groupName, setGroupName] = useState("");
+  const [description, setDescription] = useState("");
+  const [privacy, setPrivacy] = useState("Public");
+  const [message, setMessage] = useState("");
 
   // State for the View Group modal
   const [showViewModal, setShowViewModal] = useState(false);
@@ -39,7 +39,7 @@ const Groupspage = () => {
   }, [fetchPost]);
 
   useEffect(() => {
-    const saveLikes = localStorage.getItem('likePosts');
+    const saveLikes = localStorage.getItem("likePosts");
     if (saveLikes) {
       setLikePosts(new Set(JSON.parse(saveLikes)));
     }
@@ -69,20 +69,20 @@ const Groupspage = () => {
     const updatedLikePost = new Set(likePosts);
     if (updatedLikePost.has(postId)) {
       updatedLikePost.delete(postId);
-      toast.error('post disliked successfully');
+      toast.error("post disliked successfully");
     } else {
       updatedLikePost.add(postId);
-      toast.success('post liked successfully');
+      toast.success("post liked successfully");
     }
     setLikePosts(updatedLikePost);
-    localStorage.setItem('likePosts', JSON.stringify(Array.from(updatedLikePost)));
+    localStorage.setItem("likePosts", JSON.stringify(Array.from(updatedLikePost)));
 
     try {
       await handleLikePost(postId);
       await fetchPost();
     } catch (error) {
       console.error(error);
-      toast.error('failed to like or unlike the post');
+      toast.error("failed to like or unlike the post");
     }
   };
 
@@ -93,7 +93,7 @@ const Groupspage = () => {
         { userId: staticUserId },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -108,7 +108,7 @@ const Groupspage = () => {
 
   const handleCreateGroup = async () => {
     if (!groupName || !description) {
-      setMessage('❌ Please fill in all required fields.');
+      setMessage("❌ Please fill in all required fields.");
       return;
     }
 
@@ -123,17 +123,17 @@ const Groupspage = () => {
         },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      setMessage('✅ Group created successfully!');
+      setMessage("✅ Group created successfully!");
       setShowModal(false);
-      setGroupName('');
-      setDescription('');
-      setPrivacy('Public');
+      setGroupName("");
+      setDescription("");
+      setPrivacy("Public");
       fetchGroups();
     } catch (err) {
       console.error(err);
@@ -149,7 +149,7 @@ const Groupspage = () => {
   const Tab = ({ label, isActive, onClick, icon }) => (
     <button
       className={`flex-1 text-center py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-        isActive ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+        isActive ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
       }`}
       onClick={onClick}
     >
@@ -161,13 +161,13 @@ const Groupspage = () => {
   const filteredPosts = () => {
     if (!posts || !Array.isArray(posts)) return [];
 
-    if (activeTab === 'Your feed') {
+    if (activeTab === "Your feed") {
       return posts;
-    } else if (activeTab === 'Discover') {
+    } else if (activeTab === "Discover") {
       return [];
-    } else if (activeTab === 'Your groups') {
+    } else if (activeTab === "Your groups") {
       return posts.filter(post => 
-        post?.pages === 'groups' && 
+        post?.pages === "groups" && 
         groups.some(group => group._id === post?.groupId)
       );
     }
@@ -182,13 +182,13 @@ const Groupspage = () => {
     <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
       <div className="flex items-center gap-4">
         <Image 
-          src={group.admin.profilePicture || '/default-group.png'}
+          src={group.admin.profilePicture || "/default-group.png"}
           alt={group.name}
           className="w-16 h-16 rounded-full object-cover"
         />
         <div>
           <h3 className="text-lg font-semibold">{group.name}</h3>
-          <p className="text-gray-600">{group.description || 'No description available'}</p>
+          <p className="text-gray-600">{group.description || "No description available"}</p>
           <p className="text-sm text-gray-500">{group.memberCount || 0} members</p>
         </div>
       </div>
@@ -196,15 +196,15 @@ const Groupspage = () => {
         <button
           className={`py-1 px-3 rounded-lg text-sm ${
             isDiscoverTab && userGroups.some(g => g._id === group._id)
-              ? 'bg-gray-400 text-white cursor-not-allowed'
-              : 'bg-blue-500 text-white hover:bg-blue-600'
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-blue-500 text-white hover:bg-blue-600"
           }`}
           onClick={isDiscoverTab ? () => handleJoinGroup(group._id) : () => handleViewGroup(group)}
           disabled={isDiscoverTab && userGroups.some(g => g._id === group._id)}
         >
           {isDiscoverTab ? 
-            (userGroups.some(g => g._id === group._id) ? 'Joined' : 'Join Group') : 
-            'View group'}
+            (userGroups.some(g => g._id === group._id) ? "Joined" : "Join Group") : 
+            "View group"}
         </button>
         {!isDiscoverTab && (
           <button
@@ -226,9 +226,9 @@ const Groupspage = () => {
           <div className="lg:ml-2 xl:ml-28" style={{ width: "100%", marginRight: "-3rem", marginTop: "20px" }}>
             <div className="flex space-x-2 bg-gray-200 rounded-lg p-1 shadow-md mb-4">
               {[
-                { label: 'Your feed', icon: '📡' },
-                { label: 'Discover', icon: '🔍' },
-                { label: 'Your groups', icon: '👥' }
+                { label: "Your feed", icon: "📡" },
+                { label: "Discover", icon: "🔍" },
+                { label: "Your groups", icon: "👥" }
               ].map((tab) => (
                 <Tab
                   key={tab.label}
@@ -239,7 +239,7 @@ const Groupspage = () => {
                 />
               ))}
             </div>
-            {activeTab === 'Your feed' && (
+            {activeTab === "Your feed" && (
               <div className="mb-4 flex justify-between items-center">
                 <span className="text-gray-600 font-medium" style={{fontWeight:"bold"}}>Recent activity</span>
                 <button
@@ -250,7 +250,7 @@ const Groupspage = () => {
                 </button>
               </div>
             )}
-            {activeTab === 'Discover' && (
+            {activeTab === "Discover" && (
               <>
                 <div className="mb-4 flex justify-between items-center">
                   <span className="text-gray-600 font-medium" style={{fontWeight:"bold"}}>Suggested for you</span>
@@ -266,7 +266,7 @@ const Groupspage = () => {
                 </div>
               </>
             )}
-            {activeTab === 'Your groups' && (
+            {activeTab === "Your groups" && (
               <div className="mb-4 flex justify-between items-center">
                 <span className="text-gray-600 font-medium" style={{fontWeight:"bold"}}>All groups you have joined</span>
                 <button
@@ -326,7 +326,7 @@ const Groupspage = () => {
                           type="radio"
                           name="privacy"
                           value="Public"
-                          checked={privacy === 'Public'}
+                          checked={privacy === "Public"}
                           onChange={(e) => setPrivacy(e.target.value)}
                           className="form-radio text-blue-500"
                         />
@@ -337,7 +337,7 @@ const Groupspage = () => {
                           type="radio"
                           name="privacy"
                           value="Private"
-                          checked={privacy === 'Private'}
+                          checked={privacy === "Private"}
                           onChange={(e) => setPrivacy(e.target.value)}
                           className="form-radio text-blue-500"
                         />
@@ -385,12 +385,12 @@ const Groupspage = () => {
 
                   <div className="mb-4">
                     <Image 
-                      src={selectedGroup.admin.profilePicture || '/default-group.png'}
+                      src={selectedGroup.admin.profilePicture || "/default-group.png"}
                       alt={selectedGroup.name}
                       className="w-full h-48 rounded-lg object-cover mb-4"
                     />
                     <h3 className="text-lg font-semibold">{selectedGroup.name}</h3>
-                    <p className="text-gray-600">{selectedGroup.description || 'No description available'}</p>
+                    <p className="text-gray-600">{selectedGroup.description || "No description available"}</p>
                     <p className="text-sm text-gray-500 mt-2">
                       Admin: {selectedGroup.admin.username}
                     </p>
@@ -416,7 +416,7 @@ const Groupspage = () => {
             )}
 
             <div className="mt-6 space-y-6 mb-4">
-              {activeTab === 'Discover' ? (
+              {activeTab === "Discover" ? (
                 groups.length > 0 ? (
                   groups.map((group) => (
                     <GroupCard key={group._id} group={group} isDiscoverTab={true} />
@@ -424,7 +424,7 @@ const Groupspage = () => {
                 ) : (
                   <p className="text-gray-600">No groups available to discover.</p>
                 )
-              ) : activeTab === 'Your groups' ? (
+              ) : activeTab === "Your groups" ? (
                 userGroups.length > 0 ? (
                   userGroups.map((group) => (
                     <GroupCard key={group._id} group={group} isDiscoverTab={false} />
