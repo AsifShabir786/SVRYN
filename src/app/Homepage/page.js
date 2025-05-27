@@ -11,7 +11,8 @@ import toast from "react-hot-toast";
 import { Send } from "lucide-react";
 import useSidebarStore from "@/store/sidebarStore";
  import { useParams } from "next/navigation";
- import Link from 'next/link';
+ import Link from "next/link";
+import Image from "next/image";
 
 import { fetchUserProfile } from "@/service/user.service";
 import ProfileHeader from "../user-profile/ProfileHeader";
@@ -24,8 +25,8 @@ const HomePage = () => {
   const [likePosts, setLikePosts] = useState(new Set());
   const { posts, fetchPost, handleLikePost, handleCommentPost, handleSharePost } = usePostStore();
   const { isSidebarOpen } = useSidebarStore(); // Use sidebar store
-const user = JSON.parse(localStorage.getItem("user-storage") || '{}');
- console.log(user?.state?.user?._id, 'user_____1');
+const user = JSON.parse(localStorage.getItem("user-storage") || "{}");
+ console.log(user?.state?.user?._id, "user_____1");
     const id = user?.state?.user?._id
       const [posts1, setposts1] = useState([]);
 const [post, setPost] = useState(null); // only 1 item, not an array
@@ -49,11 +50,11 @@ useEffect(() => {
   fetchListings();
 }, [refresh]);
 
-      console.log('Fetched posts:___________MediaID:', posts); 
+      console.log("Fetched posts:___________MediaID:", posts); 
         useEffect(() => {
         const fetchPosts = async () => {
           try {
-            const response = await axiosInstance.get(`/postRoute/posts/user/${id}?media=${'video'}`);
+            const response = await axiosInstance.get(`/postRoute/posts/user/${id}?media=${"video"}`);
             console.log("Fetched posts:___11", response.data.data);
             setposts1(response.data.data)
           } catch (error) {
@@ -65,7 +66,7 @@ useEffect(() => {
       }, [refresh]);
     
    const [profileData, setProfileData] = useState(null);
-   console.log(profileData,'profileData_____-')
+   console.log(profileData,"profileData_____-")
    const [loading, setLoading] = useState(false);
    const [isOwner, setIsOwner] = useState(false);
  
@@ -144,7 +145,7 @@ useEffect(() => {
         <div className="flex flex-col    mx-auto bg-white shadow-md overflow-hidden">
       {/* Cover Photo */}
       <div className="w-full h-48">
-        <img src={profileData.coverPhoto || "/placeholder.svg"} alt="Cover" className="w-full h-full object-cover" />
+        <Image src={profileData.coverPhoto || "/placeholder.svg"} alt="Cover" className="w-full h-full object-cover" />
       </div>
 
       {/* Profile Info Section - Flex container for profile picture and info */}
@@ -152,7 +153,7 @@ useEffect(() => {
         {/* Profile Picture - Increased size and positioned at the top */}
         <div className="relative -mt-12 mr-4">
           <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden">
-            <img
+            <Image
               src={profileData.profilePicture || "/placeholder.svg"}
               alt="Profile"
               className="w-full h-full object-cover"
@@ -202,10 +203,10 @@ useEffect(() => {
     >
         <div className="flex flex-col">
           <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgxYUIMs1xNBhE7fKNtPXTIogB3cW9zAyLcQ&s" alt="RSVP Shop" className="w-full h-full object-cover" />
+            <Image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgxYUIMs1xNBhE7fKNtPXTIogB3cW9zAyLcQ&s" alt="RSVP Shop" className="w-full h-full object-cover" />
           </div>
           <p className="text-xs mt-1 text-center">
-            Visit {profileData.firstName}'s
+            Visit {profileData.firstName}&apos;s
             <br />
             RSVP Shop
           </p>
@@ -217,21 +218,21 @@ useEffect(() => {
     >    {/* Card 2 */}
        <div className="flex flex-col">
   <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
-    <img
+    <Image
       src={post?.imageUrl?.[0] || "https://thumbs.dreamstime.com/b/no-image-available-icon-flat-vector-no-image-available-icon-flat-vector-illustration-132482953.jpg?height=200&width=200"}
       alt="Shoes"
       className="w-full h-full object-cover"
     />
   </div>
   <p className="text-xs mt-1 text-center">
-    View {profileData?.firstName}'s
+    View {profileData?.firstName}&apos;s
     <br />
     Shoes
   </p>
 </div>
 </Link>  
 {posts1
-  // .filter((post) => post.mediaType === 'video')
+  // .filter((post) => post.mediaType === "video")
   .map((post) => (
     <Link
       key={post._id}
@@ -249,7 +250,7 @@ useEffect(() => {
 
       </div>
       <p className="text-xs mt-1 text-center">
-        View {profileData.firstName}'s
+        View {profileData.firstName}&apos;s
         <br />
         Videos
       </p>
@@ -260,10 +261,10 @@ useEffect(() => {
         {/* Card 3 */}
         {/* <div className="flex flex-col">
           <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
-            <img src="https://i.ytimg.com/vi/UH1ThWZ9hXU/hqdefault.jpg?height=200&width=200" alt="Videos" className="w-full h-full object-cover" />
+            <Image src="https://i.ytImage.com/vi/UH1ThWZ9hXU/hqdefault.jpg?height=200&width=200" alt="Videos" className="w-full h-full object-cover" />
           </div>
           <p className="text-xs mt-1 text-center">
-            View {profileData.firstName}'s
+            View {profileData.firstName}&apos;s
             <br />
             Videos
           </p>
