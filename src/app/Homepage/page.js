@@ -187,7 +187,7 @@ useEffect(() => {
       {/* Follower Stats - Moved outside the profile info container */}
       <div className="w-full bg-gray-50 py-2 px-4 border-t border-b border-gray-200">
         <div className="flex items-center space-x-4 ml-28 text-sm">
-          <div className="font-medium">{profileData.followerCount} Follows</div>
+          <div className="font-medium">{profileData.followingCount} Follows</div>
           <div className="h-4 w-px bg-gray-300"></div>
           <div className="font-medium">{profileData.followingCount} Following</div>
         </div>
@@ -211,7 +211,10 @@ useEffect(() => {
           </p>
         </div>
 </Link>
-        {/* Card 2 */}
+     <Link
+       href={`/Marketplaces?id=${id}`}
+      className="flex flex-col cursor-pointer"
+    >    {/* Card 2 */}
        <div className="flex flex-col">
   <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
     <img
@@ -226,7 +229,7 @@ useEffect(() => {
     Shoes
   </p>
 </div>
-
+</Link>  
 {posts1
   // .filter((post) => post.mediaType === 'video')
   .map((post) => (

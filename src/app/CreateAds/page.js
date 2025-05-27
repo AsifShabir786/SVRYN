@@ -1,28 +1,92 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect  } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import Link from "next/link";
 import LeftSideBar from "../components/LeftSideBar";
 import useSidebarStore from "@/store/sidebarStore";
 import { useRouter } from "next/navigation";
-
-const CreateAds = () => {
+import { Cross2Icon } from "@radix-ui/react-icons";
+import axios from "axios";
+ const CreateAds = () => {
   const { isSidebarOpen } = useSidebarStore();
   const router = useRouter();
-
+ const currentUser = JSON.parse(localStorage.getItem('user-storage'));
+  const staticUserId = currentUser?.state?.user?._id;
+  console.log(staticUserId, 'groups_________39');
   const [campaignName, setCampaignName] = useState("");
   const [campaignDetails, setCampaignDetails] = useState("");
-  const [tags, setTags] = useState({
-    foodAds: false,
-    products: false,
-    chief: false,
-  });
+  const [tags, setTags] = useState([]);
   const [campaignType, setCampaignType] = useState("");
-  const [budget, setBudget] = useState(250);
+  const [budget, setBudget] = useState(10); // default budget
   const [duration, setDuration] = useState("30 days plan");
   const [mediaFile, setMediaFile] = useState(null);
+    const [inputValue, setInputValue] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const containerRef = useRef(null);
+  console.log('mediaFile_____',mediaFile)
+  console.log('mediaFile_____1',duration)
+  console.log('mediaFile_____2',budget)
+  console.log('mediaFile_____3',campaignType)
+  console.log('mediaFile_____4',tags)
+  console.log('mediaFile_____5',campaignName)
+  console.log('mediaFile_____6',campaignDetails)
+  console.log('mediaFile_____7',selectedTags)
+
+ 
+
+  // Update budget automatically based on selected duration
+  useEffect(() => {
+    const days = parseInt(duration.split(" ")[0]);
+    const pricePer30Days = 10;
+    const calculatedBudget = (days / 30) * pricePer30Days;
+    setBudget(calculatedBudget);
+  }, [duration]);
   const [mediaPreview, setMediaPreview] = useState(null);
+const allTags = [
+    "Food Ads",
+    "Products",
+    "Chef",
+    "Meal Plans",
+    "Organic Promotions",
+    "Restaurant Launch",
+    "Recipe Videos",
+    "Nutrition Tips",
+    "Diet Campaigns",
+    "Cooking Classes",
+    "Beverage Ads",
+  ];
+
+
+
+  const filteredTags = allTags.filter(
+    (tag) =>
+      tag.toLowerCase().includes(inputValue.toLowerCase()) &&
+      !selectedTags.includes(tag)
+  );
+
+  const handleSelect = (tag) => {
+    setSelectedTags([...selectedTags, tag]);
+    setInputValue("");
+    setShowDropdown(false);
+  };
+
+  const removeTag = (tag) => {
+    setSelectedTags(selectedTags.filter((t) => t !== tag));
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleTagChange = (tag) => {
     setTags((prev) => ({
@@ -31,32 +95,95 @@ const CreateAds = () => {
     }));
   };
 
-  const handleMediaUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setMediaFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setMediaPreview(previewUrl);
-    }
-  };
+const handleMediaUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newCampaign = {
-      name: campaignName,
-      details: campaignDetails,
-      tags: Object.keys(tags).filter((key) => tags[key]),
-      type: campaignType,
-      budget,
-      duration,
-      media: mediaFile ? mediaFile.name : null,
-    };
-    // console.log("New Campaign Created:", newCampaign);
-    // alert("Ad Campaign Created Successfully!");
-    if (mediaPreview) {
-      URL.revokeObjectURL(mediaPreview);
+  // setMediaFile(file);
+  // setMediaPreview(URL.createObjectURL(file));
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset",'gptimages');
+
+  try {
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/dgmjg9zr4/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+    if (data.secure_url) {
+      setMediaPreview(data.secure_url)
+      setMediaFile(data.secure_url)
+
+      console.log("Uploaded to Cloudinary:", data.secure_url);
+      // You can save the URL in state or send it to your backend
+    } else {
+      console.error("Cloudinary upload error:", data);
     }
-    router.push("/Payment");
+  } catch (error) {
+    console.error("Upload failed:", error);
+  }
+};
+
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   const newCampaign = {
+  //     name: campaignName,
+  //     details: campaignDetails,
+  //     tags: Object.keys(tags).filter((key) => tags[key]),
+  //     type: campaignType,
+  //     budget,
+  //     duration,
+  //     media: mediaFile ? mediaFile.name : null,
+  //   };
+  //   // console.log("New Campaign Created:", newCampaign);
+  //   // alert("Ad Campaign Created Successfully!");
+  //   if (mediaPreview) {
+  //     URL.revokeObjectURL(mediaPreview);
+  //   }
+  //   router.push("/Payment");
+  // };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log('mediaFile_____', mediaFile);
+    console.log('mediaFile_____1', duration);
+    console.log('mediaFile_____2', budget);
+    console.log('mediaFile_____3', campaignType);
+    console.log('mediaFile_____4', selectedTags);
+    console.log('mediaFile_____5', campaignName);
+    console.log('mediaFile_____6', campaignDetails);
+    console.log('mediaFile_____7', selectedTags);
+
+    const formData = new FormData();
+    formData.append('mediaUrl', mediaFile); // name should match multer field
+    formData.append('duration', duration);
+    formData.append('budget', budget);
+    formData.append('campaignType', campaignType);
+    formData.append('campaignName', campaignName);
+    formData.append('campaignDetails', campaignDetails);
+    formData.append('createdBy', staticUserId);
+
+    selectedTags.forEach(tag => formData.append('selectedTags[]', tag));
+
+    try {
+      const response = await axios.post('https://fb-backend.vercel.app/adsRoute/ads', formData, {
+        headers: {
+          'Content-Type': ' application/json',
+          Authorization: `Bearer YOUR_TOKEN_HERE`, // optional if using auth
+        },
+      });
+
+      console.log('Ad created:', response.data);
+    } catch (error) {
+      console.error('Error creating ad:', error.response?.data || error.message);
+    }
   };
 
   return (
@@ -122,35 +249,48 @@ const CreateAds = () => {
               <p className="text-gray-500 text-sm mb-2">
                 Campaign tags allow you to filter more effectively on the campaign view page
               </p>
-              <div className="flex space-x-2">
-                <Button
-                  type="button"
-                  onClick={() => handleTagChange("foodAds")}
-                  className={`flex items-center px-3 py-1 rounded-lg border ${
-                    tags.foodAds ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
-                  }`}
-                >
-                  Food Ads {tags.foodAds && <X className="w-4 h-4 ml-1" />}
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => handleTagChange("products")}
-                  className={`flex items-center px-3 py-1 rounded-lg border ${
-                    tags.products ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
-                  }`}
-                >
-                  Products {tags.products && <X className="w-4 h-4 ml-1" />}
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => handleTagChange("chief")}
-                  className={`flex items-center px-3 py-1 rounded-lg border ${
-                    tags.chief ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
-                  }`}
-                >
-                  Chief {tags.chief && <X className="w-4 h-4 ml-1" />}
-                </Button>
-              </div>
+              <div ref={containerRef} className="relative w-full  ">
+      <div className="border rounded-lg p-2 bg-white">
+        <div className="flex flex-wrap gap-2">
+          {selectedTags.map((tag) => (
+            <span
+              key={tag}
+              className="flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm"
+            >
+              {tag}
+              <button
+                onClick={() => removeTag(tag)}
+                className="ml-1 hover:text-red-500"
+              >
+                <Cross2Icon className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+          <input
+            type="text"
+            value={inputValue}
+            onFocus={() => setShowDropdown(true)}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Select campaign types..."
+            className="flex-grow border-none outline-none px-2 py-1 text-sm min-w-[100px]"
+          />
+        </div>
+      </div>
+
+      {showDropdown && filteredTags.length > 0 && (
+        <ul className="absolute left-0 right-0 mt-1 border rounded-md shadow-md bg-white max-h-40 overflow-auto z-20">
+          {filteredTags.map((tag) => (
+            <li
+              key={tag}
+              onClick={() => handleSelect(tag)}
+              className="px-4 py-2 hover:bg-blue-100 cursor-pointer text-sm"
+            >
+              {tag}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
             </div>
 
             <div
@@ -281,26 +421,31 @@ const CreateAds = () => {
               style={{ width: "100%", marginRight: "-3rem", marginTop: "20px" }}
             >
               <label className="block text-gray-700 mb-1">Campaign Budget & Time</label>
-              <div className="flex space-x-2">
-                <select
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                >
-                  <option>30 days plan</option>
-                  <option>60 days plan</option>
-                  <option>90 days plan</option>
-                </select>
-                <input
-                  type="number"
-                  value={budget}
-                  onChange={(e) => setBudget(Number(e.target.value))}
-                  className="w-32 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  min="1"
-                  required
-                />
-                <span className="flex items-center text-gray-700">$</span>
-              </div>
+              <div className="flex space-x-2 items-center">
+      {/* Duration Dropdown */}
+      <select
+        value={duration}
+        onChange={(e) => setDuration(e.target.value)}
+        className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+      >
+        <option>30 days plan</option>
+        <option>60 days plan</option>
+        <option>90 days plan</option>
+      </select>
+
+      {/* Read-only budget display */}
+      <div className="relative">
+        <input
+          type="text"
+          value={`$${budget}`}
+          readOnly
+          className="p-2 w-32 border rounded-lg bg-gray-100 text-gray-800 cursor-not-allowed"
+        />
+        <span className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 pointer-events-none">
+          USD
+        </span>
+      </div>
+    </div>
             </div>
 
             <Button
