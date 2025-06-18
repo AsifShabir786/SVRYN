@@ -46,9 +46,12 @@ const Page = () => {
   } = useForm({
     resolver: yupResolver(registerSchema),
   });
+  const [linkSent, setLinkSent] = useState(false);
 
   const onSubmitLinkSend = async (data) => {
     setIsLoading(true);
+    setLinkSent(false); // reset before new attempt
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/request-reset-password`,
@@ -60,7 +63,12 @@ const Page = () => {
       );
 
       const result = await res.json();
-      alert(result.message);
+
+      if (res.ok) {
+        setLinkSent(true); // show success message
+      } else {
+        alert(result.message || "Something went wrong");
+      }
     } catch (err) {
       console.error("Reset link error:", err);
       alert("Something went wrong");
@@ -106,21 +114,12 @@ const Page = () => {
             No shadow bans, no tracking, no noise — just freedom to connect.
             Reels, spaces, news, and ethical ads, aligned with your values.
           </p>
-          {activeTab === "login" ? (
-            <button
-              className="bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors"
-              onClick={() => setActiveTab("signup")}
-            >
-              Sign Up
-            </button>
-          ) : (
-            <button
-              className="bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors"
-              onClick={() => setActiveTab("login")}
-            >
-              Log in
-            </button>
-          )}
+          <button
+            className="bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors"
+            onClick={() => router.push("/user-login")}
+          >
+            Log in
+          </button>
         </div>
       </div>
 
@@ -168,6 +167,12 @@ const Page = () => {
                   <Button className="w-full bg-black text-white" type="submit">
                     Request Link
                   </Button>
+
+                  {linkSent && (
+                    <p className="text-green-600 text-sm text-center mt-2">
+                      Request Link sent Successfully! Please check your email.
+                    </p>
+                  )}
                 </div>
               </form>
             </TabsContent>
