@@ -22,6 +22,7 @@ import userStore from "@/store/userStore";
 import { usePostStore } from "@/store/usePostStore";
 import Select from 'react-select';
 import StripeWrapper from "../Details/StripeWrapper";
+import Image from "next/image";
 
 const Picker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
@@ -257,7 +258,7 @@ const handleChange = (selectedOption) => {
 
                     {filePreview ? (
                       fileType.startsWith("image") ? (
-                        <img
+                        <Image
                         src={filePreview} alt ="preview_img" className="w-full h-auto max-h-[300px] object-cover"
                         />
                       ) : (

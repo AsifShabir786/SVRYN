@@ -76,7 +76,7 @@ const RightSideBar = () => {
           .then(res => setMessages(res.data.data))
           .catch(err => console.error(err));
       }
-    }, [selectedUser]);
+    }, [selectedUser,user]);
     const sendMessage = () => {
       axios
         .post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/send`, {
@@ -166,7 +166,7 @@ const RightSideBar = () => {
             setShowChatModal(true);
           }}
         >
-          <img
+          <Image
             src={
               userItem.profilePicture ||
               `https://ui-avatars.com/api/?name=${encodeURIComponent(userItem.username)}`
@@ -192,7 +192,7 @@ const RightSideBar = () => {
   <div className="fixed bottom-10 right-24 w-full max-w-sm bg-white rounded-lg shadow-lg z-50 border border-gray-200 flex flex-col h-[70vh]">
     <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-gray-100 rounded-t-lg">
       <div className="flex items-center space-x-2">
-        <img
+        <Image
           src={
             selectedUser.profilePicture ||
             `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.username)}`
@@ -282,7 +282,7 @@ const RightSideBar = () => {
             {userList.map((conn, index) => (
               <li key={index} className="flex items-center space-x-3">
                 <div className="relative">
-                  <img
+                  <Image
                     src={conn.profilePicture}
                     alt={conn.username}
                     className={`w-10 h-10 rounded-full border-2 ${

@@ -14,7 +14,7 @@ const Page = () => {
    useEffect(() => {
        fetchFriendRequest(),
        fetchFriendSuggestion()
-   },[])
+   },[fetchFriendRequest,fetchFriendSuggestion])
    
    const handleAction = async(action,userId) =>{
     if(action === "confirm"){

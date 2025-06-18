@@ -17,6 +17,7 @@ import {
 import { updateUserCoverPhoto, updateUserProfile } from "@/service/user.service";
 import userStore from "@/store/userStore";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
 
 const ProfileHeader = ({
   id,
@@ -292,7 +293,7 @@ const ProfileHeader = ({
               <form className="space-y-4">
                 <div className="flex flex-col items-center mb-4">
                   {coverPhotoPreview && (
-                    <img
+                    <Image
                       src={coverPhotoPreview}
                       alt="cover-photo"
                       className="w-full h-40 object-cover rounded-lg mb-4"

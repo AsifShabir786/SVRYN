@@ -18,7 +18,7 @@ const CreateGroupPage = (props) => {
 
   useEffect(() => {
     fetchGroups();
-  }, []);
+  }, [fetchGroups]);
 
   const fetchGroups = async () => {
     try {

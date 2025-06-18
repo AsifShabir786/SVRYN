@@ -6,69 +6,68 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Header from "./components/Header";
 
+export default function AuthWrapper({ children }) {
+  const { setUser, clearUser } = userStore();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const publicRoutes = ['/user-login', '/ForgetPassword', '/Resetpassword']; // Add /Resetpassword to public routes
 
-export default function AuthWrapper ({children}){
-    const {setUser,clearUser} = userStore();
-    const router = useRouter()
-    const pathname = usePathname()
-    const [loading,setLoading] = useState(true)
-    const [isAuthenticated,setIsAuthenticated] = useState(false)
-    
+  // Check if the current pathname (without query parameters) is in publicRoutes
+  const isPublicPage = publicRoutes.includes(pathname);
 
-    const isLoginPage =  pathname === '/user-login'
-
-    useEffect(()=>{
-      const checkAuth = async () =>{
-        try {
-            const result = await checkUserAuth()
-            if(result.isAuthenticated){
-                setUser(result?.user)
-                setIsAuthenticated(true)
-            }else{
-                await handleLogout()
-            }
-        } catch (error) {
-            console.error('authenticated failed',error)
-            await handleLogout()
-        }finally{
-            setLoading(false)
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const result = await checkUserAuth();
+        if (result.isAuthenticated) {
+          setUser(result?.user);
+          setIsAuthenticated(true);
+        } else {
+          await handleLogout();
         }
+      } catch (error) {
+        console.error('authenticated failed', error);
+        await handleLogout();
+      } finally {
+        setLoading(false);
       }
-   
-      const handleLogout = async () =>{
-        clearUser()
-        setIsAuthenticated(false);
-        try {
-            await logout()
-        } catch (error) {
-            console.log('logout failed please try again later',error)
-        }
-        if(!isLoginPage){
-            router.push('/user-login')
-        }
+    };
+
+    const handleLogout = async () => {
+      clearUser();
+      setIsAuthenticated(false);
+      try {
+        await logout();
+      } catch (error) {
+        console.log('logout failed please try again later', error);
       }
-
-      if(!isLoginPage){
-        checkAuth()
-      }else{
-        setLoading(false)
+      if (!isPublicPage) { // This condition remains the same as it checks if the page itself is public
+        router.push('/user-login');
       }
+    };
 
-    },[isLoginPage,router,setUser,clearUser])
-
-    if(loading){
-        return <Loader/>
+    if (!isPublicPage) {
+      checkAuth();
+    } else {
+      setLoading(false);
     }
+  }, [isPublicPage, router, setUser, clearUser]);
 
-    if(!isAuthenticated && !isLoginPage){
-        return <Loader/>
-    }
+  if (loading) {
+    return <Loader />;
+  }
 
-    return (
-        <>
-          {!isLoginPage && isAuthenticated && <Header/>}
-          {(isAuthenticated || isLoginPage ) && children}
-        </>
-    )
+  if (!isAuthenticated && !isPublicPage) {
+    return <Loader />;
+  }
+
+  return (
+    <>
+      {!isPublicPage && isAuthenticated && <Header />}
+      {(isAuthenticated || isPublicPage) && children}
+    </>
+  );
 }

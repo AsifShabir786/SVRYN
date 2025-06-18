@@ -5,6 +5,7 @@ import useSidebarStore from "@/store/sidebarStore";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const YourAds = () => {
   const { isSidebarOpen } = useSidebarStore();
@@ -82,7 +83,7 @@ const YourAds = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {dummyAds.map((ad) => (
                 <div key={ad.id} className="bg-white rounded-lg shadow-md p-4 flex flex-col">
-                  <img
+                  <Image
                     src={ad.image}
                     alt={ad.title}
                     className="w-full h-48 object-cover rounded-lg mb-2"

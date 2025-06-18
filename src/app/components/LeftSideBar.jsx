@@ -216,7 +216,7 @@ const LeftSideBar = () => {
                 setShowChatModal(true);
               }}
             >
-              <img
+              <Image
                 src={
                   userItem.profilePicture ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(userItem.username)}`
@@ -246,7 +246,7 @@ const LeftSideBar = () => {
         <div className="absolute top-[430px] left-6 w-72 bg-white rounded-lg shadow-lg z-50 border border-gray-200 flex flex-col h-[40vh]">
           <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-gray-100 rounded-t-lg">
             <div className="flex items-center space-x-2">
-              <img
+              <Image
                 src={
                   selectedUser.profilePicture ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.username)}`
