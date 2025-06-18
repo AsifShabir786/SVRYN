@@ -83,7 +83,9 @@ const LeftSideBar = () => {
   useEffect(() => {
     if (selectedUser) {
       axios
-        .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/messages/${user._id}/${selectedUser._id}`)
+        .get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/messages/${user._id}/${selectedUser._id}`
+        )
         .then((res) => setMessages(res.data.data))
         .catch((err) => console.error(err));
     }
@@ -95,11 +97,14 @@ const LeftSideBar = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const response = await axiosInstance.get(`/users/profile/6686f5dc61546b507649caf2`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axiosInstance.get(
+          `/users/profile/6686f5dc61546b507649caf2`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (response.data.status === "success") {
           setProfileData(response.data.data.profile.bio);
         } else {
@@ -181,11 +186,13 @@ const LeftSideBar = () => {
           : "-translate-x-full"
       } md:bg-transparent md:shadow-none`}
     >
- <div
+      <div
         className={`bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 w-full mt-5 overflow-y-auto ${
           pathname === "/Chatpage" ? "h-[1600px]" : "max-h-[400px]"
         }`}
-      >        {navItems.map((item) => (
+      >
+        {" "}
+        {navItems.map((item) => (
           <button
             key={item.path}
             className={`w-full flex items-center p-2 mb-2 rounded transition-colors ${
@@ -199,40 +206,47 @@ const LeftSideBar = () => {
           </button>
         ))}
       </div>
-{pathname !== "/Chatpage" && (
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 w-full mt-5">
-        <h3 className="text-lg font-semibold mb-4">Online Connections</h3>
-        <ul className="space-y-2 overflow-y-auto max-h-[600px]">
-          {userList.map((userItem) => (
-            <li
-              key={userItem._id}
-              className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer transition-all ${
-                selectedUser?._id === userItem._id
-                  ? "bg-yellow-100"
-                  : "hover:bg-gray-100"
-              }`}
-              onClick={() => {
-                setSelectedUser(userItem);
-                setShowChatModal(true);
-              }}
-            >
-              <Image
-                src={
-                  userItem.profilePicture ||
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(userItem.username)}`
-                }
-                alt={userItem.username}
-                className="w-10 h-10 rounded-full border-2 border-gray-300"
-              />
-              <span className="text-sm font-medium text-gray-700 break-words">
-                {userItem.username}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-)}
-      <div className="border-t border-yellow-700 pt-3 pl-3 flex justify-center items-center space-x-2 font-semibold text-sm tracking-widest w-full" style={{ color: "#b79f68" }}>
+      {pathname !== "/Chatpage" && (
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 w-full mt-5">
+          <h3 className="text-lg font-semibold mb-4">Online Connections</h3>
+          <ul className="space-y-2 overflow-y-auto max-h-[600px]">
+            {userList.map((userItem) => (
+              <li
+                key={userItem._id}
+                className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer transition-all ${
+                  selectedUser?._id === userItem._id
+                    ? "bg-yellow-100"
+                    : "hover:bg-gray-100"
+                }`}
+                onClick={() => {
+                  setSelectedUser(userItem);
+                  setShowChatModal(true);
+                }}
+              >
+                <Image
+                  src={
+                    userItem.profilePicture ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      userItem.username
+                    )}`
+                  }
+                  width={20}
+                  height={20}
+                  alt={userItem.username}
+                  className="w-10 h-10 rounded-full border-2 border-gray-300"
+                />
+                <span className="text-sm font-medium text-gray-700 break-words">
+                  {userItem.username}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div
+        className="border-t border-yellow-700 pt-3 pl-3 flex justify-center items-center space-x-2 font-semibold text-sm tracking-widest w-full"
+        style={{ color: "#b79f68" }}
+      >
         <Image
           src="/images/icontop.png"
           alt="Transmission Icon"
@@ -249,12 +263,18 @@ const LeftSideBar = () => {
               <Image
                 src={
                   selectedUser.profilePicture ||
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.username)}`
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    selectedUser.username
+                  )}`
                 }
+                width={20}
+                height={20}
                 alt={selectedUser.username}
                 className="w-8 h-8 rounded-full"
               />
-              <span className="text-sm font-semibold text-gray-700">{selectedUser.username}</span>
+              <span className="text-sm font-semibold text-gray-700">
+                {selectedUser.username}
+              </span>
             </div>
             <button
               onClick={() => setShowChatModal(false)}

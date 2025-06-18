@@ -20,16 +20,7 @@ export default function Loader() {
 
   return (
     <div className="fixed inset-0 flex flex-col gap-4 items-center justify-center bg-light  dark:bg-blue-200 z-50">
-        <div className="relative  w-40 h-40">
-        {/* <Image
-    src="https://res.cloudinary.com/dgmjg9zr4/image/upload/v1742551109/Facebook_Logo.png-removebg-preview_neuvui.png"
-    alt="Facebook Logo"
-    className="w-full h-full object-contain"
-    initial={{ opacity: 0, scale: 0.5 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.5 }}
-  /> */}
-        </div>
+      <div className="relative  w-40 h-40"></div>
       <div className="flex space-x-3">
         {[0, 1, 2].map((index) => (
           <motion.div
