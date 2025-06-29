@@ -19,14 +19,14 @@ import { formateDate } from "@/lib/utils";
 const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const commentInputRef = useRef(null)
+  const commentInputRef = useRef(null);
 
-  const handleCommentClick = () =>{
+  const handleCommentClick = () => {
     setShowComments(true);
-    setTimeout(() =>{
+    setTimeout(() => {
       commentInputRef?.current?.focus();
-    },0)
-  }
+    }, 0);
+  };
   const userPostPlaceholder = post?.user?.username
     ?.split(" ")
     .map((name) => name[0])
@@ -68,34 +68,32 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
       <Card>
         <CardContent className="p-6  dark:text-white">
           <div className="flex items-center justify-between mb-4">
-            <div
-              className="flex items-center space-x-3 cursor-pointer"
-
-            >
+            <div className="flex items-center space-x-3 cursor-pointer">
               <Avatar>
                 {post?.user?.profilePicture ? (
-                                 <AvatarImage
-                                 src={post?.user?.profilePicture}
-                                 alt={post?.user?.username}
-                                 />
-                ):(
-                  <AvatarFallback className="dark:bg-gray-400">{userPostPlaceholder}</AvatarFallback>
+                  <AvatarImage
+                    src={post?.user?.profilePicture}
+                    alt={post?.user?.username}
+                  />
+                ) : (
+                  <AvatarFallback className="dark:bg-gray-400">
+                    {userPostPlaceholder}
+                  </AvatarFallback>
                 )}
-    
-              
-  
               </Avatar>
               <div>
                 <p className="font-semibold dark:text-white">
-                <span className="text-gray-800 font-semibold">{post?.user?.username}</span>
-{post?.groupName && (
-  <>
-    <span className="text-gray-500 mx-1">posted in</span>
-    <span className="text-gray-800 font-medium">{post.groupName}</span>
-  </>
-)}
-
-
+                  <span className="text-gray-800 font-semibold">
+                    {post?.user?.username}
+                  </span>
+                  {post?.groupName && (
+                    <>
+                      <span className="text-gray-500 mx-1">posted in</span>
+                      <span className="text-gray-800 font-medium">
+                        {post.groupName}
+                      </span>
+                    </>
+                  )}
                 </p>
                 <p className="font-sm text-gray-500">
                   {formateDate(post?.createdAt)}
@@ -112,6 +110,8 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
               src={post?.mediaUrl}
               alt="post_image"
               className="w-full h-auto rounded-lg mb-4"
+              width={"200"}
+              height={"200"}
             />
           )}
           {post?.mediaUrl && post.mediaType === "video" && (
@@ -127,12 +127,12 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
             <div className="flex gap-3">
               <span
                 className="text-sm text-gray-500 dark:text-gray-400 hover:border-b-2 border-gray-400 cursor-pointer "
-              onClick={() => setShowComments(!showComments)}
+                onClick={() => setShowComments(!showComments)}
               >
-                    {post?.commentCount} comments
+                {post?.commentCount} comments
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400 hover:border-b-2 border-gray-400 cursor-pointer ">
-              {post?.shareCount} share
+                {post?.shareCount} share
               </span>
             </div>
           </div>
@@ -140,7 +140,9 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
           <div className="flex justify-between mb-2">
             <Button
               variant="ghost"
-              className={`flex-1 dark:hover:bg-gray-600 ${isLiked ? "text-blue-600" :""}`}
+              className={`flex-1 dark:hover:bg-gray-600 ${
+                isLiked ? "text-blue-600" : ""
+              }`}
               onClick={onLike}
             >
               <ThumbsUp className="mr-2 h-4 w-4" /> Like
@@ -152,31 +154,35 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
             >
               <MessageCircle className="mr-2 h-4 w-4" /> Comment
             </Button>
-            <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-  <DialogTrigger asChild>
-    <Button
-      variant="ghost"
-      className="flex-1 dark:hover:bg-gray-500"
-    >
-      <Share2 className="mr-2 h-4 w-4" />
-      Share
-    </Button>
-  </DialogTrigger>
-  <DialogContent className="bg-white p-6  rounded z-[9999] max-w-md w-full mx-auto">
-  <DialogHeader>
-    <DialogTitle>Share This Post</DialogTitle>
-    <DialogDescription>
-      Choose how you want to share this post.
-    </DialogDescription>
-  </DialogHeader>
+            <Dialog
+              open={isShareDialogOpen}
+              onOpenChange={setIsShareDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex-1 dark:hover:bg-gray-500"
+                >
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-white p-6  rounded z-[9999] max-w-md w-full mx-auto">
+                <DialogHeader>
+                  <DialogTitle>Share This Post</DialogTitle>
+                  <DialogDescription>
+                    Choose how you want to share this post.
+                  </DialogDescription>
+                </DialogHeader>
 
-  <div className="flex flex-col space-y-4 mt-4">
-    <Button onClick={() => handleShare("facebook")}>Share on Svryn Social</Button>
-     <Button onClick={() => handleShare("copy")}>Copy Link</Button>
-  </div>
-</DialogContent>
-
-</Dialog>
+                <div className="flex flex-col space-y-4 mt-4">
+                  <Button onClick={() => handleShare("facebook")}>
+                    Share on Svryn Social
+                  </Button>
+                  <Button onClick={() => handleShare("copy")}>Copy Link</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           <Separator className="mb-2 dark:bg-gray-400" />
           <AnimatePresence>

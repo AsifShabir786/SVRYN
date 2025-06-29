@@ -9,7 +9,7 @@ import { Star } from "lucide-react";
 import PaymentButton from "../Details/PaymentButton";
 import StripeWrapper from "../Details/StripeWrapper";
 import axios from "axios";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 
 const Marketplaces = () => {
   const { isSidebarOpen } = useSidebarStore();
@@ -35,24 +35,49 @@ const Marketplaces = () => {
   const [message, setMessage] = useState("");
   const [showUserListings, setShowUserListings] = useState(false); // New state for user listings page
 
-  const currentUser = JSON.parse(localStorage.getItem('user-storage'));
-  const staticUserId = currentUser?.state?.user?._id;
+  const currentUser = JSON.parse(localStorage.getItem("user-storage"));
+  // const staticUserId = currentUser?.state?.user?._id;
+  var staticUserId = localStorage.getItem("userId");
+
   const token = localStorage.getItem("token");
-  const sellerName = currentUser?.state?.user?.username;
-   const searchParams = useSearchParams();
-    const _id = searchParams.get('id');
+  const sellerName = localStorage.getItem("username");
+  const _id = localStorage.getItem("userId");
+
+  const searchParams = useSearchParams();
+  // const _id = searchParams.get("id");
   const categoryOptions = [
-    "Tools", "Furniture", "Household", "Garden", "Appliances", "Entertainment",
-    "Video Games", "Books, Films, Music", "Luggage", "Women's Dressing", "Men's Dressing",
-    "Jewellery", "Health Care", "Pet supplies", "Baby Care", "Toys", "Games", "Electronics",
-    "Bicycles", "Arts", "Sports and Games", "Cars", "Cars Parts",
+    "Tools",
+    "Furniture",
+    "Household",
+    "Garden",
+    "Appliances",
+    "Entertainment",
+    "Video Games",
+    "Books, Films, Music",
+    "Luggage",
+    "Women's Dressing",
+    "Men's Dressing",
+    "Jewellery",
+    "Health Care",
+    "Pet supplies",
+    "Baby Care",
+    "Toys",
+    "Games",
+    "Electronics",
+    "Bicycles",
+    "Arts",
+    "Sports and Games",
+    "Cars",
+    "Cars Parts",
   ];
 
   // Fetch listings
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch(`https://fb-backend.vercel.app/MarketPlace/ListingsBySellerId/${_id}`);
+        const response = await fetch(
+          `https://fb-backend.vercel.app/MarketPlace/ListingsBySellerId/${_id}`
+        );
         const data = await response.json();
         console.log("Fetched data:12", data);
         if (data.status === "success") {
@@ -73,7 +98,9 @@ const Marketplaces = () => {
   // Handle category checkbox changes
   const handleCheckboxChange = (option) => {
     setSelectedOptions((prev) =>
-      prev.includes(option) ? prev.filter((item) => item !== option) : [...prev, option]
+      prev.includes(option)
+        ? prev.filter((item) => item !== option)
+        : [...prev, option]
     );
   };
 
@@ -108,7 +135,14 @@ const Marketplaces = () => {
   };
 
   const handleCreateListing = async () => {
-    if (!title || !description || !phoneNumber || !condition || !price || selectedOptions.length === 0) {
+    if (
+      !title ||
+      !description ||
+      !phoneNumber ||
+      !condition ||
+      !price ||
+      selectedOptions.length === 0
+    ) {
       setErrMsg("Please fill in all required fields, including phone number");
       return;
     }
@@ -163,7 +197,11 @@ const Marketplaces = () => {
       setMessage1("");
     } catch (err) {
       console.error("API error:", err.response?.data || err.message);
-      setMessage(`❌ Failed to create listing: ${err.response?.data?.message || err.message}`);
+      setMessage(
+        `❌ Failed to create listing: ${
+          err.response?.data?.message || err.message
+        }`
+      );
     }
   };
 
@@ -236,13 +274,21 @@ const Marketplaces = () => {
   };
 
   const filteredPosts = posts.filter((post) => {
-    const matchesTitle = post.title.toLowerCase().includes(inputValue.toLowerCase());
+    const matchesTitle = post.title
+      .toLowerCase()
+      .includes(inputValue.toLowerCase());
     const matchesServiceType = selectedOption
-      ? post.category.some((cat) => cat.toLowerCase() === selectedOption.toLowerCase())
+      ? post.category.some(
+          (cat) => cat.toLowerCase() === selectedOption.toLowerCase()
+        )
       : true;
-    const matchesPriceFrom = priceFrom ? post.price >= parseFloat(priceFrom) : true;
+    const matchesPriceFrom = priceFrom
+      ? post.price >= parseFloat(priceFrom)
+      : true;
     const matchesPriceTo = priceTo ? post.price <= parseFloat(priceTo) : true;
-    return matchesTitle && matchesServiceType && matchesPriceFrom && matchesPriceTo;
+    return (
+      matchesTitle && matchesServiceType && matchesPriceFrom && matchesPriceTo
+    );
   });
 
   return (
@@ -253,11 +299,16 @@ const Marketplaces = () => {
           className="flex-1 px-4 py-6 md:ml-80 lg:mr-80 lg:max-w-3xl xl:max-w-4xl mx-auto"
           style={{ width: "100%", maxWidth: "1600px" }}
         >
-          <div className="lg:ml-2 xl:ml-28" style={{ width: "100%", marginRight: "-3rem", marginTop: "20px" }}>
+          <div
+            className="lg:ml-2 xl:ml-28"
+            style={{ width: "100%", marginRight: "-3rem", marginTop: "20px" }}
+          >
             {!showUserListings ? (
               <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Marketplace</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Marketplace
+                  </h2>
                   <div className="flex items-center space-x-3">
                     <button
                       className="p-3 bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 ease-in-out transform rounded-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -281,9 +332,7 @@ const Marketplaces = () => {
                     placeholder="Find what you need"
                     className="flex-1 p-3 border border-gray-200 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50 text-gray-700 placeholder-gray-400 transition-all duration-300"
                   />
-                  <button
-                    className="px-5 py-3 bg-gray-200 text-gray-700 rounded-r-xl hover:bg-gray-300 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  >
+                  <button className="px-5 py-3 bg-gray-200 text-gray-700 rounded-r-xl hover:bg-gray-300 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <Search className="w-5 h-5" />
                   </button>
                 </div>
@@ -307,8 +356,12 @@ const Marketplaces = () => {
                             </div>
                           )}
                           <div className="space-y-1">
-                            <h2 className="font-semibold text-base truncate">{post.title}</h2>
-                            <p className="text-blue-600 font-bold text-sm">${post.price}</p>
+                            <h2 className="font-semibold text-base truncate">
+                              {post.title}
+                            </h2>
+                            <p className="text-blue-600 font-bold text-sm">
+                              ${post.price}
+                            </p>
                             <div className="flex items-center space-x-1">
                               {[...Array(4)].map((_, index) => (
                                 <Star
@@ -321,7 +374,9 @@ const Marketplaces = () => {
                                 style={{ clipPath: "inset(0 50% 0 0)" }}
                                 fill="currentColor"
                               />
-                              <span className="text-xs text-gray-500 dark:text-gray-500">4.5</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-500">
+                                4.5
+                              </span>
                             </div>
                             <p className="text-xs text-gray-500 dark:text-gray-500 truncate">
                               {post.category?.join(", ")}
@@ -331,7 +386,9 @@ const Marketplaces = () => {
                       </Link>
                     ))
                   ) : (
-                    <div className="text-center text-gray-500 mt-8">No posts found.</div>
+                    <div className="text-center text-gray-500 mt-8">
+                      No posts found.
+                    </div>
                   )}
                 </div>
               </div>
@@ -339,7 +396,9 @@ const Marketplaces = () => {
               // User Listings Page
               <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Your Listings</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Your Listings
+                  </h2>
                   <div className="flex items-center space-x-3">
                     <button
                       className="flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md"
@@ -348,9 +407,7 @@ const Marketplaces = () => {
                       <Plus className="w-5 h-5 mr-2" />
                       Create new listing
                     </button>
-                    <button
-                      className="p-3 bg-gray-500 text-white hover:bg-gray-600 transition-all duration-300 ease-in-out transform rounded-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    >
+                    <button className="p-3 bg-gray-500 text-white hover:bg-gray-600 transition-all duration-300 ease-in-out transform rounded-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-300">
                       Back
                     </button>
                   </div>
@@ -361,9 +418,7 @@ const Marketplaces = () => {
                     placeholder="Search your listings"
                     className="flex-1 p-3 border border-gray-200 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50 text-gray-700 placeholder-gray-400 transition-all duration-300"
                   />
-                  <button
-                    className="px-5 py-3 bg-gray-200 text-gray-700 rounded-r-xl hover:bg-gray-300 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  >
+                  <button className="px-5 py-3 bg-gray-200 text-gray-700 rounded-r-xl hover:bg-gray-300 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <Search className="w-5 h-5" />
                   </button>
                 </div>
@@ -386,10 +441,15 @@ const Marketplaces = () => {
                           </div>
                         )}
                         <div className="space-y-1">
-                          <h2 className="font-semibold text-base truncate">{post.title}</h2>
-                          <p className="text-blue-600 font-bold text-sm">${post.price}</p>
+                          <h2 className="font-semibold text-base truncate">
+                            {post.title}
+                          </h2>
+                          <p className="text-blue-600 font-bold text-sm">
+                            ${post.price}
+                          </p>
                           <p className="text-xs text-gray-500 dark:text-gray-500">
-                            Listed on {new Date(post.createdAt).toLocaleDateString()}
+                            Listed on{" "}
+                            {new Date(post.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="mt-3 flex justify-between">
@@ -458,7 +518,9 @@ const Marketplaces = () => {
               </div>
             </div>
             <div className="mb-4">
-              <label className="block font-medium text-gray-700">Description</label>
+              <label className="block font-medium text-gray-700">
+                Description
+              </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -467,7 +529,9 @@ const Marketplaces = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-medium text-gray-700">Feature Listing</label>
+              <label className="block font-medium text-gray-700">
+                Feature Listing
+              </label>
               <div className="flex gap-4 mt-2">
                 <label className="flex items-center space-x-2">
                   <input
@@ -498,7 +562,9 @@ const Marketplaces = () => {
               )}
             </div>
             <div className="mb-4">
-              <label className="block font-medium text-gray-700">Categories</label>
+              <label className="block font-medium text-gray-700">
+                Categories
+              </label>
               <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto mt-2 border rounded p-2">
                 {categoryOptions.map((option) => (
                   <label key={option} className="flex items-center space-x-2">
@@ -514,7 +580,9 @@ const Marketplaces = () => {
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block font-medium text-gray-700">Condition</label>
+                <label className="block font-medium text-gray-700">
+                  Condition
+                </label>
                 <select
                   value={condition}
                   onChange={(e) => setCondition(e.target.value)}
@@ -526,7 +594,9 @@ const Marketplaces = () => {
                 </select>
               </div>
               <div>
-                <label className="block font-medium text-gray-700">Amount</label>
+                <label className="block font-medium text-gray-700">
+                  Amount
+                </label>
                 <input
                   type="number"
                   value={price}
@@ -537,7 +607,9 @@ const Marketplaces = () => {
               </div>
             </div>
             <div className="mb-4">
-              <label className="block font-medium text-gray-700">Upload Images</label>
+              <label className="block font-medium text-gray-700">
+                Upload Images
+              </label>
               <input
                 type="file"
                 accept="image/*"
@@ -545,7 +617,11 @@ const Marketplaces = () => {
                 onChange={handleImageUpload}
                 className="w-full border px-3 py-2 rounded mt-1"
               />
-              {uploading && <p className="text-sm text-blue-600 mt-2">Uploading images...</p>}
+              {uploading && (
+                <p className="text-sm text-blue-600 mt-2">
+                  Uploading images...
+                </p>
+              )}
               {imageUrls.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
                   {imageUrls.map((url, index) => (
@@ -560,7 +636,11 @@ const Marketplaces = () => {
               )}
             </div>
             {errMsg && <span style={{ color: "red" }}>{errMsg}</span>}
-            {message && <span style={{ color: message.includes("✅") ? "green" : "red" }}>{message}</span>}
+            {message && (
+              <span style={{ color: message.includes("✅") ? "green" : "red" }}>
+                {message}
+              </span>
+            )}
             <div className="flex justify-end gap-4 mt-6">
               <button
                 className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 transition-colors"

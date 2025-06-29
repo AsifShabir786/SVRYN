@@ -41,6 +41,9 @@ const Chatpage = () => {
   const [showChatModal, setShowChatModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  var userId = localStorage.getItem("userId");
+  console.log(selectedUser, "selectedUser");
+  console.log(userId, "selectedUser11");
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -76,12 +79,14 @@ const Chatpage = () => {
     if (selectedUser) {
       axios
         .get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/messages/${user._id}/${selectedUser._id}`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/messages/${userId}/${selectedUser._id}`
         )
-        .then((res) => setMessages(res.data.data))
+        .then((res) => {
+          setMessages(res.data.data);
+        })
         .catch((err) => console.error(err));
     }
-  }, [selectedUser, user._id]);
+  }, [selectedUser, userId]);
 
   // LeftSideBar useEffect
   useEffect(() => {
@@ -115,7 +120,7 @@ const Chatpage = () => {
   const sendMessage = () => {
     axios
       .post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/send`, {
-        senderId: user._id,
+        senderId: userId,
         receiverId: selectedUser._id,
         text,
       })
@@ -214,14 +219,14 @@ const Chatpage = () => {
                         <div
                           key={index}
                           className={`flex ${
-                            msg.senderId === user._id
+                            msg.senderId === userId
                               ? "justify-end"
                               : "justify-start"
                           }`}
                         >
                           <span
                             className={`px-4 py-2 rounded-lg text-sm max-w-[75%] break-words ${
-                              msg.senderId === user._id
+                              msg.senderId === userId
                                 ? "bg-blue-500 text-white"
                                 : "bg-green-400 text-black"
                             }`}

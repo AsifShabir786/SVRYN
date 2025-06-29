@@ -46,7 +46,7 @@ const Header = () => {
   const { toggleSidebar, isSidebarOpen } = useSidebarStore();
   const router = useRouter();
   const { user, clearUser } = userStore();
-
+  var userId = localStorage.getItem("userId");
   const userPlaceholder = user?.username
     ?.split(" ")
     .map((name) => name[0])
@@ -144,7 +144,10 @@ const Header = () => {
     <header className="bg-white dark:bg-gray-900 text-foreground h-24 fixed top-0 left-0 right-0 z-50 p-2">
       <div className="flex items-center md:justify-between p-2 relative">
         {/* Left Section: Toggler (Mobile) + Logo + DropdownMenu (Mobile Only) */}
-        <div className="flex items-center gap-2 md:gap-4" style={{ width: "fit-content" }}>
+        <div
+          className="flex items-center gap-2 md:gap-4"
+          style={{ width: "fit-content" }}
+        >
           {/* Toggler Button for Mobile */}
           <Button
             variant="ghost"
@@ -222,11 +225,13 @@ const Header = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600 my-2" />
                 <DropdownMenuItem
-                  onClick={() => handleNavigation(`/user-profile/${user?._id}`)}
+                  onClick={() => handleNavigation(`/user-profile/${userId}`)}
                   className="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                 >
                   <Users className="mr-3 h-5 w-5 text-gray-600 dark:text-gray-300" />
-                  <span className="text-gray-900 dark:text-gray-200">Profile</span>
+                  <span className="text-gray-900 dark:text-gray-200">
+                    Profile
+                  </span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600 my-2" />
                 <DropdownMenuItem
@@ -236,12 +241,16 @@ const Header = () => {
                   {theme === "light" ? (
                     <>
                       <Moon className="mr-3 h-5 w-5 text-gray-600 dark:text-gray-300" />
-                      <span className="text-gray-900 dark:text-gray-200">Dark Mode</span>
+                      <span className="text-gray-900 dark:text-gray-200">
+                        Dark Mode
+                      </span>
                     </>
                   ) : (
                     <>
                       <Sun className="mr-3 h-5 w-5 text-gray-600 dark:text-gray-300" />
-                      <span className="text-gray-900 dark:text-gray-200">Light Mode</span>
+                      <span className="text-gray-900 dark:text-gray-200">
+                        Light Mode
+                      </span>
                     </>
                   )}
                 </DropdownMenuItem>
@@ -250,7 +259,9 @@ const Header = () => {
                   className="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                 >
                   <LogOut className="mr-3 h-5 w-5 text-gray-600 dark:text-gray-300" />
-                  <span className="text-gray-900 dark:text-gray-200">Logout</span>
+                  <span className="text-gray-900 dark:text-gray-200">
+                    Logout
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -315,7 +326,7 @@ const Header = () => {
         {/* Right Section: Icons + DropdownMenu (Large Screens Only) */}
         <div className="hidden md:flex items-center md:space-x-4">
           <div className="flex items-center gap-2">
-            <div
+            {/* <div
               className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer ${
                 activeTab === "home" ? "bg-gray-100 dark:bg-gray-700" : ""
               }`}
@@ -323,8 +334,8 @@ const Header = () => {
               title="Home"
             >
               <Home className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-            </div>
-            <div
+            </div> */}
+            {/* <div
               className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer ${
                 activeTab === "messages" ? "bg-gray-100 dark:bg-gray-700" : ""
               }`}
@@ -335,7 +346,9 @@ const Header = () => {
             </div>
             <div
               className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer ${
-                activeTab === "notifications" ? "bg-gray-100 dark:bg-gray-700" : ""
+                activeTab === "notifications"
+                  ? "bg-gray-100 dark:bg-gray-700"
+                  : ""
               }`}
               onClick={() => handleNavigation("/", "notifications")}
               title="Notifications"
@@ -350,7 +363,7 @@ const Header = () => {
               title="Videos"
             >
               <Video className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-            </div>
+            </div> */}
           </div>
           {/* DropdownMenu (User Avatar) - Visible only in large screens */}
           <DropdownMenu>
@@ -407,11 +420,13 @@ const Header = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600 my-2" />
               <DropdownMenuItem
-                onClick={() => handleNavigation(`/user-profile/${user?._id}`)}
+                onClick={() => handleNavigation(`/user-profile/${userId}`)}
                 className="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
               >
                 <Users className="mr-3 h-5 w-5 text-gray-600 dark:text-gray-300" />
-                <span className="text-gray-900 dark:text-gray-200">Profile</span>
+                <span className="text-gray-900 dark:text-gray-200">
+                  Profile
+                </span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600 my-2" />
               <DropdownMenuItem
@@ -421,12 +436,16 @@ const Header = () => {
                 {theme === "light" ? (
                   <>
                     <Moon className="mr-3 h-5 w-5 text-gray-600 dark:text-gray-300" />
-                    <span className="text-gray-900 dark:text-gray-200">Dark Mode</span>
+                    <span className="text-gray-900 dark:text-gray-200">
+                      Dark Mode
+                    </span>
                   </>
                 ) : (
                   <>
                     <Sun className="mr-3 h-5 w-5 text-gray-600 dark:text-gray-300" />
-                    <span className="text-gray-900 dark:text-gray-200">Light Mode</span>
+                    <span className="text-gray-900 dark:text-gray-200">
+                      Light Mode
+                    </span>
                   </>
                 )}
               </DropdownMenuItem>

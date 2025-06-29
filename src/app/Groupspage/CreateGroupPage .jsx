@@ -1,21 +1,21 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const CreateGroupPage = (props) => {
   const [showModal, setShowModal] = useState(false);
-  const [groupName, setGroupName] = useState('');
-  const [description, setDescription] = useState('');
-  const [message, setMessage] = useState('');
+  const [groupName, setGroupName] = useState("");
+  const [description, setDescription] = useState("");
+  const [message, setMessage] = useState("");
   const [groups, setGroups] = useState([]);
-  
+
   // const currentUser=localStorage.getItem('user-storage')
-  console.log(groups,'groups_________3')
-    
-  const currentUser = JSON.parse(localStorage.getItem('user-storage'));
-  const staticUserId = currentUser?.state?.user?._id;
-  console.log(staticUserId, 'groups_________39');
-  
+  console.log(groups, "groups_________3");
+
+  const currentUser = JSON.parse(localStorage.getItem("user-storage"));
+  var staticUserId = localStorage.getItem("userId");
+  console.log(staticUserId, "groups_________39");
+
   // const staticUserId = '6686f5dc61546b507649caf2';
   const token = localStorage.getItem("token");
 
@@ -34,7 +34,7 @@ const CreateGroupPage = (props) => {
         }
       );
       setGroups(response.data?.data || []);
-      props.getgroups(response.data?.data || [])
+      props.getgroups(response.data?.data || []);
     } catch (error) {
       console.error("Error fetching groups:", error);
     }
@@ -51,20 +51,24 @@ const CreateGroupPage = (props) => {
         },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      setMessage('✅ Group created successfully!');
+      setMessage("✅ Group created successfully!");
       setShowModal(false);
-      setGroupName('');
-      setDescription('');
+      setGroupName("");
+      setDescription("");
       fetchGroups(); // Refresh group list
     } catch (err) {
       console.error(err);
-      setMessage(`❌ Failed to create group: ${err.response?.data?.message || err.message}`);
+      setMessage(
+        `❌ Failed to create group: ${
+          err.response?.data?.message || err.message
+        }`
+      );
     }
   };
 
@@ -75,7 +79,7 @@ const CreateGroupPage = (props) => {
         { userId: staticUserId },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -84,12 +88,19 @@ const CreateGroupPage = (props) => {
       fetchGroups(); // Refresh after joining
     } catch (error) {
       console.error("Error joining group:", error);
-      setMessage(`❌ Could not join group: ${error.response?.data?.message || error.message}`);
+      setMessage(
+        `❌ Could not join group: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-10" style={{ marginTop: '3rem' }}>
+    <div
+      className="min-h-screen bg-gray-100 p-10"
+      style={{ marginTop: "3rem" }}
+    >
       <h1 className="text-3xl font-bold mb-6">Create a New Group</h1>
 
       <button
@@ -106,44 +117,44 @@ const CreateGroupPage = (props) => {
       )}
 
       {/* Group List */}
-    
-{groups.length > 0 && (
-  <div className="mt-10">
-    <h2 className="text-2xl font-semibold mb-4">Available Groups</h2>
-    <div className="flex flex-col gap-4">
-      {groups.map((group) => {
-        const isJoined =
-          Array.isArray(group.members) &&
-          group.members.includes(staticUserId);
 
-        return (
-          <div
-            key={group._id}
-            className="bg-white p-4 rounded-lg shadow flex justify-between items-center"
-          >
-            <span className="font-medium text-lg">{group.name}</span>
+      {groups.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-2xl font-semibold mb-4">Available Groups</h2>
+          <div className="flex flex-col gap-4">
+            {groups.map((group) => {
+              const isJoined =
+                Array.isArray(group.members) &&
+                group.members.includes(staticUserId);
 
-            {isJoined ? (
-              <button
-                className="bg-gray-400 text-white px-4 py-1 rounded cursor-not-allowed"
-                disabled
-              >
-                ✅ Joined
-              </button>
-            ) : (
-              <button
-                className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
-                onClick={() => handleJoinGroup(group._id)}
-              >
-                Join
-              </button>
-            )}
+              return (
+                <div
+                  key={group._id}
+                  className="bg-white p-4 rounded-lg shadow flex justify-between items-center"
+                >
+                  <span className="font-medium text-lg">{group.name}</span>
+
+                  {isJoined ? (
+                    <button
+                      className="bg-gray-400 text-white px-4 py-1 rounded cursor-not-allowed"
+                      disabled
+                    >
+                      ✅ Joined
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
+                      onClick={() => handleJoinGroup(group._id)}
+                    >
+                      Join
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
-    </div>
-  </div>
-)}
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (
@@ -152,7 +163,9 @@ const CreateGroupPage = (props) => {
             <h2 className="text-xl font-semibold mb-4">New Group</h2>
 
             <div className="mb-4">
-              <label className="block font-medium text-gray-700">Group Name</label>
+              <label className="block font-medium text-gray-700">
+                Group Name
+              </label>
               <input
                 type="text"
                 value={groupName}
@@ -163,7 +176,9 @@ const CreateGroupPage = (props) => {
             </div>
 
             <div className="mb-4">
-              <label className="block font-medium text-gray-700">Description</label>
+              <label className="block font-medium text-gray-700">
+                Description
+              </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}

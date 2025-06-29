@@ -43,11 +43,11 @@ const HomePage = () => {
   // const user = JSON.parse(localStorage.getItem("user-storage") || "{}");
   // console.log(user?.state?.user?._id, "user_____1");
   // const id = user?.state?.user?._id;
-  const user = JSON.parse(localStorage.getItem("user-storage") || "{}");
+  const user = localStorage.getItem("user-storage");
   console.log(user?.state, "user_____12");
 
-  console.log(user, "user_____121");
-  const id = user?.state?.user?.userId;
+  // console.log(user, "user_____121");
+  const id = localStorage.getItem("userId");
   const [posts1, setposts1] = useState([]);
   const [post, setPost] = useState(null); // only 1 item, not an array
 
@@ -163,9 +163,8 @@ const HomePage = () => {
       <div className="flex flex-col min-h-screen bg-background text-foreground">
         <main className="flex flex-1 pt-16">
           {/* Show LeftSideBar on mobile only if isSidebarOpen is true, always show on md and above */}
-          {/* {isSidebarOpen && */}
+          {/* {isSidebarOpen &&} */}
           <LeftSideBar />
-          {/* } */}
           <div
             className="flex-1 px-4 py-6 md:ml-80 lg:mr-80 lg:max-w-3xl xl:max-w-4xl mx-auto"
             style={{ width: "100%", maxWidth: "1600px" }}

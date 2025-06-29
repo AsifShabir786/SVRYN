@@ -33,7 +33,8 @@ const LeftSideBar = () => {
   const router = useRouter();
   const pathname = usePathname(); // Get the current pathname
   const { user, clearUser } = userStore();
-
+  var userId = localStorage.getItem("userId");
+  console.log(userId, "selectedUser11");
   // RightSideBar States
   const [showAllSponsers, setShowAllSponsers] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -84,12 +85,12 @@ const LeftSideBar = () => {
     if (selectedUser) {
       axios
         .get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/messages/${user._id}/${selectedUser._id}`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/messages/${userId}/${selectedUser._id}`
         )
         .then((res) => setMessages(res.data.data))
         .catch((err) => console.error(err));
     }
-  }, [selectedUser, user._id]);
+  }, [selectedUser, userId]);
 
   // LeftSideBar useEffect
   useEffect(() => {
@@ -97,14 +98,11 @@ const LeftSideBar = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const response = await axiosInstance.get(
-          `/users/profile/6686f5dc61546b507649caf2`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axiosInstance.get(`/users/profile/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.data.status === "success") {
           setProfileData(response.data.data.profile.bio);
         } else {
@@ -123,7 +121,7 @@ const LeftSideBar = () => {
   const sendMessage = () => {
     axios
       .post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/send`, {
-        senderId: user._id,
+        senderId: userId,
         receiverId: selectedUser._id,
         text,
       })
@@ -230,9 +228,9 @@ const LeftSideBar = () => {
                       userItem.username
                     )}`
                   }
+                  alt="cover"
                   width={20}
                   height={20}
-                  alt={userItem.username}
                   className="w-10 h-10 rounded-full border-2 border-gray-300"
                 />
                 <span className="text-sm font-medium text-gray-700 break-words">
@@ -289,12 +287,12 @@ const LeftSideBar = () => {
                 <div
                   key={index}
                   className={`flex ${
-                    msg.senderId === user._id ? "justify-end" : "justify-start"
+                    msg.senderId === userId ? "justify-end" : "justify-start"
                   }`}
                 >
                   <span
                     className={`px-4 py-2 rounded-lg text-sm max-w-[75%] break-words ${
-                      msg.senderId === user._id
+                      msg.senderId === userId
                         ? "bg-blue-500 text-white"
                         : "bg-green-400 text-black"
                     }`}

@@ -15,13 +15,20 @@ import Image from "next/image";
 const Groupspage = () => {
   const [isPostFormOpen, setIsPostFormOpen] = useState(false);
   const [likePosts, setLikePosts] = useState(new Set());
-  const { posts, fetchPost, handleLikePost, handleCommentPost, handleSharePost } = usePostStore();
+  const {
+    posts,
+    fetchPost,
+    handleLikePost,
+    handleCommentPost,
+    handleSharePost,
+  } = usePostStore();
   const [groups, setGroups] = useState([]);
   const { isSidebarOpen } = useSidebarStore();
   const [activeTab, setActiveTab] = useState("Your feed");
   const token = localStorage.getItem("token");
   const currentUser = JSON.parse(localStorage.getItem("user-storage"));
-  const staticUserId = currentUser?.state?.user?._id;
+  // const staticUserId = currentUser?.state?.user?._id;
+  var staticUserId = localStorage.getItem("userId");
 
   // State for the Create Group modal
   const [showModal, setShowModal] = useState(false);
@@ -45,10 +52,6 @@ const Groupspage = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchGroups();
-  }, [fetchGroups]);
-
   const fetchGroups = async () => {
     try {
       const response = await axios.get(
@@ -64,7 +67,9 @@ const Groupspage = () => {
       console.error("Error fetching groups:", error);
     }
   };
-
+  useEffect(() => {
+    fetchGroups();
+  }, []);
   const handleLike = async (postId) => {
     const updatedLikePost = new Set(likePosts);
     if (updatedLikePost.has(postId)) {
@@ -75,7 +80,10 @@ const Groupspage = () => {
       toast.success("post liked successfully");
     }
     setLikePosts(updatedLikePost);
-    localStorage.setItem("likePosts", JSON.stringify(Array.from(updatedLikePost)));
+    localStorage.setItem(
+      "likePosts",
+      JSON.stringify(Array.from(updatedLikePost))
+    );
 
     try {
       await handleLikePost(postId);
@@ -102,7 +110,11 @@ const Groupspage = () => {
       fetchGroups();
     } catch (error) {
       console.error("Error joining group:", error);
-      setMessage(`❌ Could not join group: ${error.response?.data?.message || error.message}`);
+      setMessage(
+        `❌ Could not join group: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   };
 
@@ -137,7 +149,11 @@ const Groupspage = () => {
       fetchGroups();
     } catch (err) {
       console.error(err);
-      setMessage(`❌ Failed to create group: ${err.response?.data?.message || err.message}`);
+      setMessage(
+        `❌ Failed to create group: ${
+          err.response?.data?.message || err.message
+        }`
+      );
     }
   };
 
@@ -149,7 +165,9 @@ const Groupspage = () => {
   const Tab = ({ label, isActive, onClick, icon }) => (
     <button
       className={`flex-1 text-center py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-        isActive ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+        isActive
+          ? "bg-blue-500 text-white"
+          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
       }`}
       onClick={onClick}
     >
@@ -166,45 +184,60 @@ const Groupspage = () => {
     } else if (activeTab === "Discover") {
       return [];
     } else if (activeTab === "Your groups") {
-      return posts.filter(post => 
-        post?.pages === "groups" && 
-        groups.some(group => group._id === post?.groupId)
+      return posts.filter(
+        (post) =>
+          post?.pages === "groups" &&
+          groups.some((group) => group._id === post?.groupId)
       );
     }
     return posts;
   };
 
-  const userGroups = groups.filter(group => 
+  const userGroups = groups.filter((group) =>
     group.members.includes(staticUserId)
   );
 
   const GroupCard = ({ group, isDiscoverTab = false }) => (
     <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <Image 
+        <Image
           src={group.admin.profilePicture || "/default-group.png"}
           alt={group.name}
+          width={64}
+          height={64}
           className="w-16 h-16 rounded-full object-cover"
         />
         <div>
           <h3 className="text-lg font-semibold">{group.name}</h3>
-          <p className="text-gray-600">{group.description || "No description available"}</p>
-          <p className="text-sm text-gray-500">{group.memberCount || 0} members</p>
+          <p className="text-gray-600">
+            {group.description || "No description available"}
+          </p>
+          <p className="text-sm text-gray-500">
+            {group.memberCount || 0} members
+          </p>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <button
           className={`py-1 px-3 rounded-lg text-sm ${
-            isDiscoverTab && userGroups.some(g => g._id === group._id)
+            isDiscoverTab && userGroups.some((g) => g._id === group._id)
               ? "bg-gray-400 text-white cursor-not-allowed"
               : "bg-blue-500 text-white hover:bg-blue-600"
           }`}
-          onClick={isDiscoverTab ? () => handleJoinGroup(group._id) : () => handleViewGroup(group)}
-          disabled={isDiscoverTab && userGroups.some(g => g._id === group._id)}
+          onClick={
+            isDiscoverTab
+              ? () => handleJoinGroup(group._id)
+              : () => handleViewGroup(group)
+          }
+          disabled={
+            isDiscoverTab && userGroups.some((g) => g._id === group._id)
+          }
         >
-          {isDiscoverTab ? 
-            (userGroups.some(g => g._id === group._id) ? "Joined" : "Join Group") : 
-            "View group"}
+          {isDiscoverTab
+            ? userGroups.some((g) => g._id === group._id)
+              ? "Joined"
+              : "Join Group"
+            : "View group"}
         </button>
         {!isDiscoverTab && (
           <button
@@ -222,13 +255,19 @@ const Groupspage = () => {
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
       <main className="flex flex-1 pt-16">
         {(isSidebarOpen || window.innerWidth >= 768) && <LeftSideBar />}
-        <div className="flex-1 px-4 py-6 md:ml-80 lg:mr-80 lg:max-w-3xl xl:max-w-4xl mx-auto" style={{ width: "100%", maxWidth: "1600px" }}>
-          <div className="lg:ml-2 xl:ml-28" style={{ width: "100%", marginRight: "-3rem", marginTop: "20px" }}>
+        <div
+          className="flex-1 px-4 py-6 md:ml-80 lg:mr-80 lg:max-w-3xl xl:max-w-4xl mx-auto"
+          style={{ width: "100%", maxWidth: "1600px" }}
+        >
+          <div
+            className="lg:ml-2 xl:ml-28"
+            style={{ width: "100%", marginRight: "-3rem", marginTop: "20px" }}
+          >
             <div className="flex space-x-2 bg-gray-200 rounded-lg p-1 shadow-md mb-4">
               {[
                 { label: "Your feed", icon: "📡" },
                 { label: "Discover", icon: "🔍" },
-                { label: "Your groups", icon: "👥" }
+                { label: "Your groups", icon: "👥" },
               ].map((tab) => (
                 <Tab
                   key={tab.label}
@@ -241,7 +280,12 @@ const Groupspage = () => {
             </div>
             {activeTab === "Your feed" && (
               <div className="mb-4 flex justify-between items-center">
-                <span className="text-gray-600 font-medium" style={{fontWeight:"bold"}}>Recent activity</span>
+                <span
+                  className="text-gray-600 font-medium"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Recent activity
+                </span>
                 <button
                   className="bg-blue-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-blue-600"
                   onClick={() => setShowModal(true)}
@@ -253,7 +297,12 @@ const Groupspage = () => {
             {activeTab === "Discover" && (
               <>
                 <div className="mb-4 flex justify-between items-center">
-                  <span className="text-gray-600 font-medium" style={{fontWeight:"bold"}}>Suggested for you</span>
+                  <span
+                    className="text-gray-600 font-medium"
+                    style={{ fontWeight: "bold" }}
+                  >
+                    Suggested for you
+                  </span>
                   <button
                     className="bg-blue-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-blue-600"
                     onClick={() => setShowModal(true)}
@@ -262,13 +311,20 @@ const Groupspage = () => {
                   </button>
                 </div>
                 <div className="mb-4 flex justify-between items-center">
-                  <span className="text-gray-600 font-medium">Group you might be interested in.</span>
+                  <span className="text-gray-600 font-medium">
+                    Group you might be interested in.
+                  </span>
                 </div>
               </>
             )}
             {activeTab === "Your groups" && (
               <div className="mb-4 flex justify-between items-center">
-                <span className="text-gray-600 font-medium" style={{fontWeight:"bold"}}>All groups you have joined</span>
+                <span
+                  className="text-gray-600 font-medium"
+                  style={{ fontWeight: "bold" }}
+                >
+                  All groups you have joined
+                </span>
                 <button
                   className="bg-blue-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-blue-600"
                   onClick={() => setShowModal(true)}
@@ -291,10 +347,14 @@ const Groupspage = () => {
                       ✕
                     </button>
                   </div>
-                  <p className="text-sm text-gray-500 mb-4">ALL FIELDS ARE REQUIRED UNLESS INDICATED.</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    ALL FIELDS ARE REQUIRED UNLESS INDICATED.
+                  </p>
 
                   <div className="mb-4">
-                    <label className="block font-medium text-gray-700">Group Name</label>
+                    <label className="block font-medium text-gray-700">
+                      Group Name
+                    </label>
                     <input
                       type="text"
                       value={groupName}
@@ -303,11 +363,15 @@ const Groupspage = () => {
                       className="w-full border px-3 py-2 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter a brief name"
                     />
-                    <p className="text-sm text-gray-500 mt-1">{70 - groupName.length} characters left</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {70 - groupName.length} characters left
+                    </p>
                   </div>
 
                   <div className="mb-4">
-                    <label className="block font-medium text-gray-700">Description</label>
+                    <label className="block font-medium text-gray-700">
+                      Description
+                    </label>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
@@ -315,11 +379,15 @@ const Groupspage = () => {
                       className="w-full border px-3 py-2 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter what your group is all about"
                     />
-                    <p className="text-sm text-gray-500 mt-1">{250 - description.length} characters left</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {250 - description.length} characters left
+                    </p>
                   </div>
 
                   <div className="mb-4">
-                    <label className="block font-medium text-gray-700">Choose</label>
+                    <label className="block font-medium text-gray-700">
+                      Choose
+                    </label>
                     <div className="flex gap-4 mt-2">
                       <label className="flex items-center gap-2">
                         <input
@@ -347,14 +415,32 @@ const Groupspage = () => {
                   </div>
 
                   <div className="mb-4">
-                    <label className="block font-medium text-gray-700">Upload Image (OPTIONAL)</label>
+                    <label className="block font-medium text-gray-700">
+                      Upload Image (OPTIONAL)
+                    </label>
                     <div className="border-dashed border-2 border-gray-300 rounded-lg p-4 text-center mt-1">
                       <div className="flex justify-center mb-2">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V12m0 0V8m0 4h4m-4 0H3m14-4v8m0 0v4m0-4h4m-4 0h-4"></path>
+                        <svg
+                          className="w-8 h-8 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M7 16V12m0 0V8m0 4h4m-4 0H3m14-4v8m0 0v4m0-4h4m-4 0h-4"
+                          ></path>
                         </svg>
                       </div>
-                      <p className="text-gray-500">Drag & drop file or <span className="text-blue-500 cursor-pointer">Browse</span></p>
+                      <p className="text-gray-500">
+                        Drag & drop file or{" "}
+                        <span className="text-blue-500 cursor-pointer">
+                          Browse
+                        </span>
+                      </p>
                     </div>
                   </div>
 
@@ -364,7 +450,9 @@ const Groupspage = () => {
                   >
                     Submit
                   </button>
-                  {message && <p className="mt-2 text-center text-sm">{message}</p>}
+                  {message && (
+                    <p className="mt-2 text-center text-sm">{message}</p>
+                  )}
                 </div>
               </div>
             )}
@@ -384,13 +472,21 @@ const Groupspage = () => {
                   </div>
 
                   <div className="mb-4">
-                    <Image 
-                      src={selectedGroup.admin.profilePicture || "/default-group.png"}
+                    <Image
+                      fill
+                      src={
+                        selectedGroup.admin.profilePicture ||
+                        "/default-group.png"
+                      }
                       alt={selectedGroup.name}
                       className="w-full h-48 rounded-lg object-cover mb-4"
                     />
-                    <h3 className="text-lg font-semibold">{selectedGroup.name}</h3>
-                    <p className="text-gray-600">{selectedGroup.description || "No description available"}</p>
+                    <h3 className="text-lg font-semibold">
+                      {selectedGroup.name}
+                    </h3>
+                    <p className="text-gray-600">
+                      {selectedGroup.description || "No description available"}
+                    </p>
                     <p className="text-sm text-gray-500 mt-2">
                       Admin: {selectedGroup.admin.username}
                     </p>
@@ -398,10 +494,12 @@ const Groupspage = () => {
                       Members: {selectedGroup.memberCount || 0}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Created: {new Date(selectedGroup.createdAt).toLocaleDateString()}
+                      Created:{" "}
+                      {new Date(selectedGroup.createdAt).toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Last Updated: {new Date(selectedGroup.updatedAt).toLocaleDateString()}
+                      Last Updated:{" "}
+                      {new Date(selectedGroup.updatedAt).toLocaleDateString()}
                     </p>
                   </div>
 
@@ -419,18 +517,30 @@ const Groupspage = () => {
               {activeTab === "Discover" ? (
                 groups.length > 0 ? (
                   groups.map((group) => (
-                    <GroupCard key={group._id} group={group} isDiscoverTab={true} />
+                    <GroupCard
+                      key={group._id}
+                      group={group}
+                      isDiscoverTab={true}
+                    />
                   ))
                 ) : (
-                  <p className="text-gray-600">No groups available to discover.</p>
+                  <p className="text-gray-600">
+                    No groups available to discover.
+                  </p>
                 )
               ) : activeTab === "Your groups" ? (
                 userGroups.length > 0 ? (
                   userGroups.map((group) => (
-                    <GroupCard key={group._id} group={group} isDiscoverTab={false} />
+                    <GroupCard
+                      key={group._id}
+                      group={group}
+                      isDiscoverTab={false}
+                    />
                   ))
                 ) : (
-                  <p className="text-gray-600">You haven&apos;t joined any groups yet.</p>
+                  <p className="text-gray-600">
+                    You haven&apos;t joined any groups yet.
+                  </p>
                 )
               ) : (
                 filteredPosts().map((post) => (
