@@ -174,7 +174,7 @@ const CreateAds = () => {
 
     try {
       const response = await axios.post(
-        "https://fb-backend.vercel.app/adsRoute/ads",
+        "http://82.221.139.203:9003/adsRoute/ads",
         formData,
         {
           headers: {

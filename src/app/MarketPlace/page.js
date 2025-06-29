@@ -56,7 +56,7 @@ import { useInputStore } from "@/store/useInputStore";
   useEffect(() => {
      const fetchListings = async () => {
       try {
-        const response = await fetch('https://fb-backend.vercel.app/MarketPlace/marketplace');
+        const response = await fetch('http://82.221.139.203:9003/MarketPlace/marketplace');
         const data = await response.json();
         console.log('Fetched data:', data);
         if (data.status === 'success') {

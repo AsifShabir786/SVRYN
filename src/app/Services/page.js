@@ -46,7 +46,7 @@ const Services = () => {
     const fetchListings = async () => {
       try {
         const response = await fetch(
-          "https://fb-backend.vercel.app/Services/Services"
+          "http://82.221.139.203:9003/Services/Services"
         );
         const data = await response.json();
         console.log("Fetched data:", data);

@@ -128,7 +128,7 @@ const CreateGroupPage = (props) => {
   const fetchGroups = async () => {
     try {
       const response = await axios.get(
-        `https://fb-backend.vercel.app/Services/Services?userId=${staticUserId}`,
+        `http://82.221.139.203:9003/Services/Services?userId=${staticUserId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -153,7 +153,7 @@ const CreateGroupPage = (props) => {
 
     try {
       await axios.post(
-        `https://fb-backend.vercel.app/Services/Services`,
+        `http://82.221.139.203:9003/Services/Services`,
         {
           sellerName: sellerName,
           title,
@@ -198,7 +198,7 @@ const CreateGroupPage = (props) => {
   const handleJoinGroup = async (groupId) => {
     try {
       const response = await axios.post(
-        `https://fb-backend.vercel.app/Services/Services/join/${groupId}`,
+        `http://82.221.139.203:9003/Services/Services/join/${groupId}`,
         { userId: staticUserId },
         {
           headers: {

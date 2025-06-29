@@ -42,7 +42,7 @@ const Details = () => {
   // ✅ Separate fetch function
   const fetchMessages = () => {
     fetch(
-      `https://fb-backend.vercel.app/api/chat/messages/${posts[0].sellerId}/${user._id}`
+      `http://82.221.139.203:9003/api/chat/messages/${posts[0].sellerId}/${user._id}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -62,7 +62,7 @@ const Details = () => {
 
     try {
       const response = await fetch(
-        "https://fb-backend.vercel.app/api/chat/send",
+        "http://82.221.139.203:9003/api/chat/send",
         {
           method: "POST",
           headers: {
@@ -103,7 +103,7 @@ const Details = () => {
     const fetchListings = async () => {
       try {
         const response = await fetch(
-          `https://fb-backend.vercel.app/marketplace/marketplace/${IdProduct}`
+          `http://82.221.139.203:9003/marketplace/marketplace/${IdProduct}`
         );
         const data = await response.json();
         console.log("Fetched data:", data);

@@ -39,7 +39,7 @@ const StorySection = () => {
 
     try {
       const response = await fetch(
-        `https://fb-backend.vercel.app/Story/api/stories/${storyId}`,
+        `http://82.221.139.203:9003/Story/api/stories/${storyId}`,
         {
           method: "PUT",
           headers: {
@@ -67,11 +67,11 @@ const StorySection = () => {
   useEffect(() => {
     fetchStories();
   }, []);
-  // https://fb-backend.vercel.app
+  // http://82.221.139.203:9003
   const fetchStories = async () => {
     try {
       const res = await axios.get(
-        "https://fb-backend.vercel.app/Story/api/stories"
+        "http://82.221.139.203:9003/Story/api/stories"
       );
       console.log("API Response:", res.data);
 
@@ -109,7 +109,7 @@ const StorySection = () => {
 
     try {
       await axios.post(
-        "https://fb-backend.vercel.app/Story/api/stories",
+        "http://82.221.139.203:9003/Story/api/stories",
         formData
       );
       alert("Story uploaded!");
@@ -138,7 +138,7 @@ const StorySection = () => {
     if (newComment.trim() && userId) {
       try {
         const response = await fetch(
-          `https://fb-backend.vercel.app/Story/api/stories/${storyId}/comments`,
+          `http://82.221.139.203:9003/Story/api/stories/${storyId}/comments`,
           {
             method: "POST",
             headers: {

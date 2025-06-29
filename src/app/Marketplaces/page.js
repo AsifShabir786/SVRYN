@@ -76,7 +76,7 @@ const Marketplaces = () => {
     const fetchListings = async () => {
       try {
         const response = await fetch(
-          `https://fb-backend.vercel.app/MarketPlace/ListingsBySellerId/${_id}`
+          `http://82.221.139.203:9003/MarketPlace/ListingsBySellerId/${_id}`
         );
         const data = await response.json();
         console.log("Fetched data:12", data);
@@ -161,7 +161,7 @@ const Marketplaces = () => {
 
     try {
       const response = await axios.post(
-        "https://fb-backend.vercel.app/MarketPlace/marketplace",
+        "http://82.221.139.203:9003/MarketPlace/marketplace",
         {
           sellerName,
           title,
@@ -240,7 +240,7 @@ const Marketplaces = () => {
   const handleMarkAsSold = async (postId) => {
     try {
       await axios.put(
-        `https://fb-backend.vercel.app/MarketPlace/marketplace/${postId}`,
+        `http://82.221.139.203:9003/MarketPlace/marketplace/${postId}`,
         { sold: true },
         {
           headers: {
@@ -259,7 +259,7 @@ const Marketplaces = () => {
   const handleDeleteListing = async (postId) => {
     try {
       await axios.delete(
-        `https://fb-backend.vercel.app/MarketPlace/marketplace/${postId}`,
+        `http://82.221.139.203:9003/MarketPlace/marketplace/${postId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
