@@ -134,14 +134,14 @@ const Post = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">What's on your mind?</label>
+              <label className="block text-sm font-medium mb-1">What&apos;s on your mind?</label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 maxLength={contentLimit}
                 className="w-full p-2 border rounded focus:ring focus:ring-blue-500"
                 rows="3"
-                placeholder="What's on your mind?"
+                placeholder="Whats on your mind?"
               />
               <p className="text-sm text-gray-500 mt-1">
                 {contentLimit - content.length} characters left
