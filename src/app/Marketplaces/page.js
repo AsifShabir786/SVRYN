@@ -76,7 +76,7 @@ const Marketplaces = () => {
     const fetchListings = async () => {
       try {
         const response = await fetch(
-          `http://82.221.139.203:9003/MarketPlace/ListingsBySellerId/${_id}`
+          `http://localhost:9003/MarketPlace/MarketPlace`
         );
         const data = await response.json();
         console.log("Fetched data:12", data);
@@ -161,7 +161,7 @@ const Marketplaces = () => {
 
     try {
       const response = await axios.post(
-        "http://82.221.139.203:9003/MarketPlace/marketplace",
+        "http://localhost:9003/MarketPlace/marketplace",
         {
           sellerName,
           title,
@@ -240,7 +240,7 @@ const Marketplaces = () => {
   const handleMarkAsSold = async (postId) => {
     try {
       await axios.put(
-        `http://82.221.139.203:9003/MarketPlace/marketplace/${postId}`,
+        `http://localhost:9003/MarketPlace/marketplace/${postId}`,
         { sold: true },
         {
           headers: {
@@ -259,7 +259,7 @@ const Marketplaces = () => {
   const handleDeleteListing = async (postId) => {
     try {
       await axios.delete(
-        `http://82.221.139.203:9003/MarketPlace/marketplace/${postId}`,
+        `http://localhost:9003/MarketPlace/marketplace/${postId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

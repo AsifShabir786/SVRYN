@@ -85,6 +85,9 @@ const YourAds = () => {
                 <div key={ad.id} className="bg-white rounded-lg shadow-md p-4 flex flex-col">
                   <Image
                     src={ad.image}
+                    width={80}
+                    height={80}
+
                     alt={ad.title}
                     className="w-full h-48 object-cover rounded-lg mb-2"
                   />

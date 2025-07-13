@@ -44,18 +44,21 @@ const HomePage = () => {
   // console.log(user?.state?.user?._id, "user_____1");
   // const id = user?.state?.user?._id;
   const user = localStorage.getItem("user-storage");
-  console.log(user?.state, "user_____12");
+  const userID = localStorage.getItem("userId");
+
+  console.log(userID, "user_____12userID");
 
   // console.log(user, "user_____121");
   const id = localStorage.getItem("userId");
   const [posts1, setposts1] = useState([]);
   const [post, setPost] = useState(null); // only 1 item, not an array
+  console.log(posts1, "user_____12posts1");
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
         const response = await fetch(
-          "http://82.221.139.203:9003/MarketPlace/marketplace"
+          "http://localhost:9003/MarketPlace/marketplace"
         );
         const data = await response.json();
         console.log("Fetched posts:___12", data.data);
@@ -177,7 +180,7 @@ const HomePage = () => {
                 {/* Cover Photo */}
                 <div className="relative w-full h-48">
                   <Image
-                    src={profileData.coverPhoto || "/placeholder.svg"}
+                    src={profileData?.coverPhoto || "/placeholder.svg"}
                     alt="Cover"
                     className="object-cover"
                     fill // Added fill prop
@@ -190,10 +193,11 @@ const HomePage = () => {
                   <div className="relative -mt-12 mr-4">
                     <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden">
                       <Image
-                        src={profileData.profilePicture || "/placeholder.svg"}
+                        src={profileData?.profilePicture || "/placeholder.svg"}
                         alt="Profile"
-                        className="object-cover"
-                        fill // Added fill prop
+                        // className="object-cover"
+                        width={250} // Added fill prop
+                        height={250}
                       />
                     </div>
                   </div>
@@ -206,9 +210,9 @@ const HomePage = () => {
                     </h1>
 
                     {/* Bio */}
-                    <p className="mt-1 text-sm text-gray-600">
-                      {profileData.bio.workplace} based in{" "}
-                      {profileData.bio.liveIn},
+                    <p className="  text-sm text-gray-600" style={{marginTop:'-1rem'}}>
+                      {profileData?.bio?.workplace} based in{" "}
+                      {profileData?.bio?.liveIn},
                       <br />
                       inspired by {profileData.desc}
                     </p>
@@ -237,85 +241,92 @@ const HomePage = () => {
                 </div>
 
                 {/* Gallery Section */}
-                <div className="grid grid-cols-3 gap-2 p-4">
-                  {/* Card 1 */}
-                  <Link
-                    href={`/Marketplaces?id=${id}`}
-                    className="flex flex-col cursor-pointer"
-                  >
-                    <div className="flex flex-col">
-                      <div className="aspect-square rounded-md overflow-hidden bg-gray-100 relative">
-                        <Image
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgxYUIMs1xNBhE7fKNtPXTIogB3cW9zAyLcQ&s"
-                          alt="RSVP Shop"
-                          className="object-cover"
-                          fill // Added fill prop
-                        />
-                      </div>
-                      <p className="text-xs mt-1 text-center">
-                        Visit {profileData.firstName}&apos;s
-                        <br />
-                        RSVP Shop
-                      </p>
-                    </div>
-                  </Link>
-                  <Link
-                    href={`/Marketplaces?id=${id}`}
-                    className="flex flex-col cursor-pointer"
-                  >
-                    {" "}
-                    {/* Card 2 */}
-                    <div className="flex flex-col">
-                      <div className="aspect-square rounded-md overflow-hidden bg-gray-100 relative">
-                        <Image
-                          src={
-                            post?.imageUrl?.[0] ||
-                            "https://thumbs.dreamstime.com/b/no-image-available-icon-flat-vector-no-image-available-icon-flat-vector-illustration-132482953.jpg?height=200&width=200"
-                          }
-                          alt="Shoes"
-                          className="object-cover"
-                          fill // Added fill prop
-                        />
-                      </div>
-                      <p className="text-xs mt-1 text-center">
-                        View {profileData?.firstName}&apos;s
-                        <br />
-                        Shoes
-                      </p>
-                    </div>
-                  </Link>
-                  {posts1
-                    // .filter((post) => post.mediaType === "video")
-                    .map((post) => (
+             <div className="grid grid-cols-3 gap-2 p-4 w-full max-w-screen-lg mx-auto">
+  {/* Card 1 */}
+  <Link
+    href={`/Marketplaces?id=${id}`}
+    className="flex flex-col cursor-pointer"
+  >
+    <div className="flex flex-col">
+      <div className="aspect-square rounded-md overflow-hidden bg-gray-100 relative">
+        <Image
+          src="https://res.cloudinary.com/dgmjg9zr4/image/upload/v1751679589/Rectangle_90_tyl2xi.png"
+          alt="RSVP Shop"
+          className="object-cover"
+          fill
+        />
+      </div>
+      <p className="text-xs mt-1 text-center">
+        Visit {profileData.firstName}&apos;s
+        <br />
+        RSVP Shop
+      </p>
+    </div>
+  </Link>
+
+  {/* Card 2 */}
+  <Link
+    href={`/Marketplaces?id=${id}`}
+    className="flex flex-col cursor-pointer"
+  >
+    <div className="flex flex-col">
+      <div className="aspect-square rounded-md overflow-hidden bg-gray-100 relative">
+        <Image
+          src={
+            // post?.imageUrl?.[0] ||
+            "https://res.cloudinary.com/dgmjg9zr4/image/upload/v1751679521/Rectangle_89_dabj42.png?height=200&width=200"
+          }
+          alt="Shoes"
+          className="object-cover"
+          fill
+        />
+      </div>
+      <p className="text-xs mt-1 text-center">
+        View {profileData?.firstName}&apos;s
+        <br />
+        Shoes
+      </p>
+    </div>
+  </Link>
+
+  {/* Card 3 */}
+  {/* <Link href="#" className="flex flex-col cursor-pointer"> */}
+    <Link
+                         href={`/Media?media=video&id=${userID}`}
+                        className="flex flex-col cursor-pointer"
+                      >
+    <div className="aspect-square rounded-md overflow-hidden bg-gray-100 relative">
+      <Image
+        src="https://res.cloudinary.com/dgmjg9zr4/image/upload/v1751679393/Frame_rkrt6w.png?height=200&width=200"
+        alt="Videos"
+        className="object-cover"
+        fill
+      />
+    </div>
+    <p className="text-xs mt-1 text-center">
+      View {profileData.firstName}&apos;s
+      <br />
+      Videos
+    </p>
+  </Link>
+</div>
+
+              </div>
+   {/* {posts1
+                     .map((post) => (
                       <Link
                         key={post._id}
                         href={`/Media?media=video&id=${id}`}
                         className="flex flex-col cursor-pointer"
-                      >
-                        <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
-                          <video
-                            src={post.mediaUrl}
-                            muted
-                            loop
-                            playsInline
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <p className="text-xs mt-1 text-center">
-                          View {profileData.firstName}&apos;s
-                          <br />
-                          Videos
-                        </p>
-                      </Link>
-                    ))}
-                </div>
-              </div>
-              <StorySection />
-
+                      > */}
+                        {/* </Link>
+                    ))} */}
               <NewPostForm
                 isPostFormOpen={isPostFormOpen}
                 setIsPostFormOpen={setIsPostFormOpen}
               />
+              <StorySection />
+
               <div className="mt-6 space-y-6 mb-4">
                 {posts.map((post) => (
                   <PostCard

@@ -46,7 +46,7 @@ const Services = () => {
     const fetchListings = async () => {
       try {
         const response = await fetch(
-          "http://82.221.139.203:9003/Services/Services"
+          "http://localhost:9003/Services/Services"
         );
         const data = await response.json();
         console.log("Fetched data:", data);

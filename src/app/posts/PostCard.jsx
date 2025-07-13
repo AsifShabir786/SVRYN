@@ -3,6 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { FaRegHeart } from "react-icons/fa";
+import { AiOutlineMessage } from "react-icons/ai";
+import { LuSend } from "react-icons/lu";
+import { FaRegMessage } from "react-icons/fa6";
+
 import { MessageCircle, MoreHorizontal, Share2, ThumbsUp } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -66,7 +71,7 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
       transition={{ duration: 0.5 }}
     >
       <Card>
-        <CardContent className="p-6  dark:text-white">
+        <CardContent className="p-0 dark:text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3 cursor-pointer">
               <Avatar>
@@ -100,9 +105,9 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
                 </p>
               </div>
             </div>
-            <Button variant="ghost" className="dark:hover:bg-gray-500">
+            {/* <Button variant="ghost" className="dark:hover:bg-gray-500">
               <MoreHorizontal className="dark:text-white h-4 w-4" />
-            </Button>
+            </Button> */}
           </div>
           <p className="mb-4">{post?.content}</p>
           {post?.mediaUrl && post.mediaType === "image" && (
@@ -120,70 +125,70 @@ const PostCard = ({ post, isLiked, onShare, onComment, onLike }) => {
               Your browser does not support the video tag
             </video>
           )}
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-gray-500 dark:text-gray-400 hover:border-b-2 border-gray-400 cursor-pointer ">
-              {post?.likeCount} likes
-            </span>
-            <div className="flex gap-3">
-              <span
-                className="text-sm text-gray-500 dark:text-gray-400 hover:border-b-2 border-gray-400 cursor-pointer "
-                onClick={() => setShowComments(!showComments)}
-              >
-                {post?.commentCount} comments
-              </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400 hover:border-b-2 border-gray-400 cursor-pointer ">
-                {post?.shareCount} share
-              </span>
-            </div>
-          </div>
-          <Separator className="mb-2 dark:bg-gray-400" />
-          <div className="flex justify-between mb-2">
-            <Button
-              variant="ghost"
-              className={`flex-1 dark:hover:bg-gray-600 ${
-                isLiked ? "text-blue-600" : ""
-              }`}
-              onClick={onLike}
-            >
-              <ThumbsUp className="mr-2 h-4 w-4" /> Like
-            </Button>
-            <Button
-              variant="ghost"
-              className={`flex-1 dark:hover:bg-gray-600 `}
-              onClick={handleCommentClick}
-            >
-              <MessageCircle className="mr-2 h-4 w-4" /> Comment
-            </Button>
-            <Dialog
-              open={isShareDialogOpen}
-              onOpenChange={setIsShareDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="flex-1 dark:hover:bg-gray-500"
-                >
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-white p-6  rounded z-[9999] max-w-md w-full mx-auto">
-                <DialogHeader>
-                  <DialogTitle>Share This Post</DialogTitle>
-                  <DialogDescription>
-                    Choose how you want to share this post.
-                  </DialogDescription>
-                </DialogHeader>
+   <div className="flex justify-between items-center mb-4">
+  {/* Left side: Like, Comment, Share buttons */}
+  <div className="flex items-center gap-3">
+<Button
+  variant="ghost"
+  className={`relative flex flex-col items-center dark:hover:bg-gray-600 ${
+    isLiked ? "text-blue-600" : ""
+  }`}
+  onClick={onLike}
+>
+  {/* Heart Icon */}
+  <FaRegHeart className="w-[24px] h-[32.22px]" />
 
-                <div className="flex flex-col space-y-4 mt-4">
-                  <Button onClick={() => handleShare("facebook")}>
-                    Share on Svryn Social
-                  </Button>
-                  <Button onClick={() => handleShare("copy")}>Copy Link</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+  {/* Badge below icon, moved lower */}
+  {post?.likeCount > 0 && (
+    <span className="absolute bottom-[-18px] left-1/2 transform -translate-x-1/2 text-xs bg-red-500 text-white rounded-full px-2 py-0.5">
+      {post.likeCount} Likes
+    </span>
+  )}
+</Button>
+
+    <Button
+      variant="ghost"
+      className="dark:hover:bg-gray-600"
+      onClick={handleCommentClick}
+    >
+      <AiOutlineMessage className="w-[24px] h-[32.22px]" />
+    </Button>
+
+    <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" className="dark:hover:bg-gray-500">
+          <LuSend className="w-[24px] h-[32.22px]" />
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="bg-white p-6 rounded z-[9999] max-w-md w-full mx-auto">
+        <DialogHeader>
+          <DialogTitle>Share This Post</DialogTitle>
+          <DialogDescription>
+            Choose how you want to share this post.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col space-y-4 mt-4">
+          <Button onClick={() => handleShare("facebook")}>
+            Share on Svryn Social
+          </Button>
+          <Button onClick={() => handleShare("copy")}>Copy Link</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </div>
+
+  {/* Right side: Comment Count Badge */}
+  <span
+    className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:border-b-2 border-gray-400 cursor-pointer"
+    onClick={() => setShowComments(!showComments)}
+  >
+    {post?.commentCount}
+    <FaRegMessage />
+  </span>
+</div>
+
           <Separator className="mb-2 dark:bg-gray-400" />
           <AnimatePresence>
             {showComments && (

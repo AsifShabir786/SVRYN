@@ -128,7 +128,7 @@ const CreateGroupPage = (props) => {
   const fetchGroups = async () => {
     try {
       const response = await axios.get(
-        `http://82.221.139.203:9003/Services/Services?userId=${staticUserId}`,
+        `http://localhost:9003/Services/Services?userId=${staticUserId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -153,7 +153,7 @@ const CreateGroupPage = (props) => {
 
     try {
       await axios.post(
-        `http://82.221.139.203:9003/Services/Services`,
+        `http://localhost:9003/Services/Services`,
         {
           sellerName: sellerName,
           title,
@@ -198,7 +198,7 @@ const CreateGroupPage = (props) => {
   const handleJoinGroup = async (groupId) => {
     try {
       const response = await axios.post(
-        `http://82.221.139.203:9003/Services/Services/join/${groupId}`,
+        `http://localhost:9003/Services/Services/join/${groupId}`,
         { userId: staticUserId },
         {
           headers: {

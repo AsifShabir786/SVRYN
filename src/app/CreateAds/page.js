@@ -8,6 +8,12 @@ import useSidebarStore from "@/store/sidebarStore";
 import { useRouter } from "next/navigation";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import axios from "axios";
+import { Elements } from "@stripe/react-stripe-js";
+import StripeCheckoutForm from "../StripeCheckoutForm/page";
+import { loadStripe } from '@stripe/stripe-js'; // Add this import
+
+const stripePromise = loadStripe('pk_test_51Oqyo3Ap5li0mnBdxJiCZ4k0IEWVbOgGvyMbYB6XVUqYh1yNUEnRiX4e5UO1eces9kf9qZNZcF7ybjxg7MimKmUQ00a9s60Pa1');
+
 const CreateAds = () => {
   const { isSidebarOpen } = useSidebarStore();
   const router = useRouter();
@@ -26,6 +32,9 @@ const CreateAds = () => {
   const [inputValue, setInputValue] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+    const [getMessage, setgetMessage] = useState(false);
+    const [showProceedForm, setShowProceedForm] = useState(false);
+  
   const containerRef = useRef(null);
   console.log("mediaFile_____", mediaFile);
   console.log("mediaFile_____1", duration);
@@ -130,28 +139,10 @@ const CreateAds = () => {
       console.error("Upload failed:", error);
     }
   };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   const newCampaign = {
-  //     name: campaignName,
-  //     details: campaignDetails,
-  //     tags: Object.keys(tags).filter((key) => tags[key]),
-  //     type: campaignType,
-  //     budget,
-  //     duration,
-  //     media: mediaFile ? mediaFile.name : null,
-  //   };
-  //   // console.log("New Campaign Created:", newCampaign);
-  //   // alert("Ad Campaign Created Successfully!");
-  //   if (mediaPreview) {
-  //     URL.revokeObjectURL(mediaPreview);
-  //   }
-  //   router.push("/Payment");
-  // };
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  e.stopPropagation(); // ✅ Prevent bubbling
     console.log("mediaFile_____", mediaFile);
     console.log("mediaFile_____1", duration);
     console.log("mediaFile_____2", budget);
@@ -174,7 +165,7 @@ const CreateAds = () => {
 
     try {
       const response = await axios.post(
-        "http://82.221.139.203:9003/adsRoute/ads",
+        "http://localhost:9003/adsRoute/ads",
         formData,
         {
           headers: {
@@ -183,6 +174,8 @@ const CreateAds = () => {
           },
         }
       );
+alert("Data added successfully")
+  window.location.reload(); // This reloads the page after alert is closed
 
       console.log("Ad created:", response.data);
     } catch (error) {
@@ -216,9 +209,26 @@ const CreateAds = () => {
               </Link>
             </div>
           </div>
-
-          <form onSubmit={handleSubmit}>
-            <div
+   {showProceedForm && (
+            <div className="absolute inset-0 z-50 bg-white flex items-center justify-center">
+              <div className="w-full max-w-2xl p-6 border border-gray-300 rounded-lg shadow-lg bg-white">
+                 
+          
+                <Elements stripe={stripePromise}>
+                  <StripeCheckoutForm getMessage={setgetMessage} amount={10}  description={""} />
+                </Elements>
+                 <Button
+                    // type="submit"
+                    disabled={!getMessage}
+                    onSubmit={handleSubmit}
+                    className="w-full bg-green-600 mt-4 text-white py-2 rounded hover:bg-green-700"
+                  >
+                    Submit
+                  </Button>
+              </div>
+            </div>
+          )}
+ <form onSubmit={handleSubmit} className="relative">            <div
               className="lg:ml-2 xl:ml-28"
               style={{ width: "100%", marginRight: "-3rem", marginTop: "20px" }}
             >
@@ -479,12 +489,15 @@ const CreateAds = () => {
             </div>
 
             <Button
-              type="submit"
+      type="button"
+
+      onClick={() => setShowProceedForm(true)}
               className="lg:ml-2 xl:ml-28 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-all duration-300 mt-2"
             >
               Proceed
             </Button>
           </form>
+        
         </div>
       </main>
     </div>

@@ -1,3 +1,5 @@
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -5,13 +7,16 @@ const nextConfig = {
       "res.cloudinary.com",
       "encrypted-tbn0.gstatic.com",
       "ui-avatars.com",
-      "lh3.googleusercontent.com", // <-- ADD THIS LINE
-      "avatars.githubusercontent.com", // <-- ADD THIS LINE
-      "cdn.pixabay.com", // <-- ADD THIS LINE
-      "thumbs.dreamstime.com", // <--- ADD THIS ONE
-      "fb-backend.vercel.app", // <--- ADD THIS ONE IF YOUR POST IMAGES COME FROM HERE
+      "lh3.googleusercontent.com",
+      "avatars.githubusercontent.com",
+      "cdn.pixabay.com",
+      "thumbs.dreamstime.com",
+      "fb-backend.vercel.app",
+      "images.unsplash.com"
     ],
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})(nextConfig);

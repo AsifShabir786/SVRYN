@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { X, Plus } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
 
 // Simulated dynamic fetch for Short Ads
 const fetchAdsData = async () => {
@@ -135,44 +136,69 @@ const fetchRecentAdsData = async () => {
 };
 
 // Story Preview Component
-const StoryPreview = ({ file, fileType, onClose, username, avatar }) => {
+const StoryPreview = ({ file, fileType, onClose, username, avatar, onNext, onPrevious }) => {
   const userPlaceholder = username?.split(" ").map((name) => name[0]).join("");
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-      <div className="relative w-full max-w-md h-[70vh] flex flex-col bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-        <Button
-          className="absolute top-4 right-4 z-10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-          variant="ghost"
+    <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+      {/* Modal Container */}
+      <div className="relative w-full max-w-3xl h-[90vh] flex  bg-black rounded-lg overflow-hidden">
+        {/* Close button */}
+        <button
           onClick={onClose}
+          className="absolute top-4 right-4 z-10 text-white hover:text-gray-300"
         >
-          <X className="h-6 w-6" />
-        </Button>
-        <div className="absolute top-4 left-4 z-10 flex items-center">
-          <Avatar className="w-10 h-10 mr-2">
+          ✖
+        </button>
+
+        {/* User Info */}
+        <div className="absolute top-4 left-4 z-10 flex items-center text-white">
+          <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center mr-2 text-sm font-semibold">
             {avatar ? (
-              <AvatarImage src={avatar} alt={username} />
+              <img src={avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
             ) : (
-              <AvatarFallback>{userPlaceholder}</AvatarFallback>
+              userPlaceholder
             )}
-          </Avatar>
-          <span className="text-gray-700 dark:text-gray-200 font-semibold">
-            {username}
-          </span>
+          </div>
+          <span className="font-semibold">{username}</span>
         </div>
-        <div className="flex-grow flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+
+        {/* Main Content Area */}
+        <div className="flex-grow flex items-center justify-center bg-black">
+          {/* Previous button */}
+          {onPrevious && (
+            <button
+              onClick={onPrevious}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-white bg-opacity-20 hover:bg-opacity-40 p-2 rounded-full z-10"
+            >
+              ◀
+            </button>
+          )}
+
+          {/* Media */}
           {fileType === "image" ? (
             <img
               src={file}
               alt="story_preview"
-              className="max-w-full max-h-full object-contain"
+              className="w-full h-full object-contain"
             />
           ) : (
             <video
               src={file}
               controls
               autoPlay
-              className="max-w-full max-h-full object-contain"
+              className="w-full h-full object-contain bg-black"
             />
+          )}
+
+          {/* Next button */}
+          {onNext && (
+            <button
+              onClick={onNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-white bg-opacity-20 hover:bg-opacity-40 p-2 rounded-full z-10"
+            >
+              ▶
+            </button>
           )}
         </div>
       </div>
@@ -180,26 +206,148 @@ const StoryPreview = ({ file, fileType, onClose, username, avatar }) => {
   );
 };
 
+
+
 // Ads Component
 const Ads = () => {
   const { isSidebarOpen } = useSidebarStore();
   const [ads, setAds] = useState([]);
   const [recentAds, setRecentAds] = useState([]);
   const [selectedStory, setSelectedStory] = useState(null);
+const [videoStories, setVideoStories] = useState([]); // only videos
+const [selectedIndex, setSelectedIndex] = useState(null); // index of current story
+  const [likedAds, setLikedAds] = useState({});
+  const [refresh, setRefresh] = useState(false);
+  const [showCommentBox, setShowCommentBox] = useState({});
+  const [commentText, setCommentText] = useState({});
+var currentUserId=localStorage.getItem("userId")
+ 
+  const handleLikeToggle = async (adId) => {
+    const isLiked = !likedAds[adId];
+    setLikedAds((prev) => ({ ...prev, [adId]: isLiked }));
+    await handleLikeAction(adId, isLiked);
+  };
+
+  const handleLikeAction = async (adId, isLiked) => {
+    try {
+      const formData = new FormData();
+      formData.append("isLiked", isLiked);
+
+      await axios.put(
+        `http://localhost:9003/adsRoute/ads/${adId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+    } catch (error) {
+      console.error("Error updating like:", error);
+    }
+  };
+
+  const toggleCommentBox = (adId) => {
+    setShowCommentBox((prev) => ({
+      ...prev,
+      [adId]: !prev[adId],
+    }));
+  };
+
+  const handleCommentChange = (adId, text) => {
+    setCommentText((prev) => ({
+      ...prev,
+      [adId]: text,
+    }));
+  };
+
+  const submitComment = async (adId) => {
+    const comment = commentText[adId]?.trim();
+    if (!comment) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("comment", comment);
+      formData.append("userId", currentUserId);
+
+      await axios.put(
+        `http://localhost:9003/adsRoute/ads/${adId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      console.log("Comment submitted");
+      setCommentText((prev) => ({ ...prev, [adId]: "" }));
+      setShowCommentBox((prev) => ({ ...prev, [adId]: false }));
+      setRefresh(!refresh)
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    }
+  }
+
+useEffect(() => {
+  const videos = ads.filter((ad) =>
+    ad.mediaUrl?.match(/\.(mp4|mov|webm|ogg)$/i)
+  );
+  setVideoStories(videos);
+}, [ads]);
+
+
+  const fetchAdsData = async () => {
+    try {
+      const response = await fetch("http://localhost:9003/adsRoute/ads");
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch ads:", error);
+      return [];
+    }
+  };
+
+  const fetchRecentAdsData = async () => {
+    // You can modify this if recent ads come from a different endpoint or logic
+    return fetchAdsData(); // Assuming it’s the same API for now
+  };
 
   useEffect(() => {
     const loadAds = async () => {
       const shortAdsData = await fetchAdsData();
+      console.log(shortAdsData,'shortAdsData_______')
       const recentAdsData = await fetchRecentAdsData();
-      setAds(shortAdsData);
+      // setAds(shortAdsData);
       setRecentAds(recentAdsData);
     };
     loadAds();
-  }, []);
+  }, [refresh]);
 
-  const handleStoryClick = (story) => {
-    setSelectedStory(story);
+ const fetchAdsData1 = async () => {
+    try {
+      const response = await fetch("http://localhost:9003/Adsadshort/ads");
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch ads:", error);
+      return [];
+    }
   };
+
+  const fetchRecentAdsData1 = async () => {
+    // You can modify this if recent ads come from a different endpoint or logic
+    return fetchAdsData1(); // Assuming it’s the same API for now
+  };
+
+  useEffect(() => {
+    const loadAds = async () => {
+      const shortAdsData = await fetchAdsData1();
+      console.log(shortAdsData,'shortAdsData_______')
+      const recentAdsData = await fetchRecentAdsData1();
+      setAds(shortAdsData);
+      // setRecentAds(recentAdsData);
+    };
+    loadAds();
+  }, []);
+const handleStoryClick = (ad) => {
+  const index = videoStories.findIndex((story) => story._id === ad._id);
+  if (index !== -1) setSelectedIndex(index);
+};
+
+
 
   const handleClosePreview = () => {
     setSelectedStory(null);
@@ -216,102 +364,158 @@ const Ads = () => {
           style={{ width: "100%", maxWidth: "1600px" }}
         >
           <div className="lg:ml-2 xl:ml-28" style={{ width: "100%", marginRight: "-3rem", marginTop: "20px" }}>
-            <div className="mb-4 flex justify-between items-center">
-              <span className="text-xl" style={{ fontWeight: "bold", fontSize: "20px" }}>
-                Short Ads
-              </span>
-              <Link href="/AdManager">
-                <Button className="bg-blue-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-blue-600 flex items-center gap-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4ZM12 6C9.79 6 8 7.79 8 10C8 12.21 9.79 14 12 14C14.21 14 16 12.21 16 10C16 7.79 14.21 6 12 6Z"
-                      fill="white"
-                    />
-                  </svg>
-                  Ad Manager
-                </Button>
-              </Link>
-            </div>
+           
             {/* Short Ads Section with Card Layout */}
-            <div className="mb-6">
-              <div className="flex space-x-4 overflow-x-auto">
-                {ads.map((ad) => (
-                  <div
-                    key={ad.id}
-                    className="bg-white rounded-lg shadow-md p-2 w-48 h-64 flex flex-col items-center justify-between cursor-pointer"
-                    onClick={() => handleStoryClick(ad)}
-                  >
-                    <img
-                      src={ad.file}
-                      alt={ad.title}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                    />
-                    <div className="flex items-center w-full p-2">
-                      <Avatar className="w-8 h-8 mr-2">
-                        {ad.avatar ? (
-                          <AvatarImage src={ad.avatar} alt={ad.username} />
-                        ) : (
-                          <AvatarFallback>{userPlaceholder(ad.username)}</AvatarFallback>
-                        )}
-                      </Avatar>
-                      <span className="text-gray-700 font-semibold text-sm">{ad.title}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+      {/* Short Ads Header */}
+<div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+  <span className="text-xl font-bold">Short Ads</span>
+  <Link href="/Shortads">
+    <Button className="bg-blue-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-blue-600 flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4ZM12 6C9.79 6 8 7.79 8 10C8 12.21 9.79 14 12 14C14.21 14 16 12.21 16 10C16 7.79 14.21 6 12 6Z"
+          fill="white"
+        />
+      </svg>
+      Ad Manager
+    </Button>
+  </Link>
+</div>
+
+{/* Short Ads Video Cards */}
+<div className="mb-6">
+  <div className="flex flex-wrap gap-4 justify-start">
+    {ads
+      .filter((ad) => ad.mediaUrl?.match(/\.(mp4|mov|webm|ogg)$/i))
+      .map((ad) => (
+        <div
+          key={ad._id}
+          className="bg-white rounded-lg shadow-md w-48 h-64 flex flex-col justify-between overflow-hidden cursor-pointer"
+          onClick={() => handleStoryClick(ad)}
+        >
+          <div className="h-48 w-full bg-black">
+            <video
+              src={ad.mediaUrl}
+              controls
+              autoPlay
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="flex items-center w-full p-2">
+            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-white mr-2">
+              {ad.createdBy?.firstName?.[0]}
             </div>
-            <div className="mb-4 flex justify-between items-center">
-              <span className="text-xl" style={{ fontWeight: "bold", fontSize: "20px" }}>
-                Recent Ads
-              </span>
-              <Link href="/CreateAds">  
-                <Button className="bg-blue-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-blue-600">
-                  Create Ads
-                </Button>
-              </Link>
+            <span className="text-gray-700 font-semibold text-sm truncate">
+              {ad.campaignName}
+            </span>
+          </div>
+        </div>
+      ))}
+  </div>
+</div>
+
+{/* Recent Ads Header */}
+<div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+  <span className="text-xl font-bold">Recent Ads</span>
+  <Link href="/CreateAds">
+    <Button className="bg-blue-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-blue-600">
+      Create Ads
+    </Button>
+  </Link>
+</div>
+
+{/* Recent Ads Grid Layout */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {recentAds.map((ad) => (
+    <div key={ad._id} className="bg-white p-4 rounded-lg shadow flex flex-col">
+      {/* Media */}
+      <img
+        src={ad.mediaUrl}
+        alt={ad.campaignName}
+        className="w-full h-40 object-cover rounded-lg mb-3"
+      />
+
+      {/* Top Row (User + Actions) */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center overflow-hidden">
+          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-2 font-semibold text-white text-sm">
+            {ad.createdBy?.firstName?.[0] || ad.createdBy?.email?.[0]}
+          </div>
+          <p className="font-semibold text-sm truncate">
+            {ad.createdBy?.firstName || ""} {ad.createdBy?.lastName || ad.createdBy?.email}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-600 whitespace-nowrap">
+          <span className="cursor-pointer" onClick={() => handleLikeToggle(ad._id)}>
+            {likedAds[ad._id] || ad.isLiked ? "❤️" : "🤍"}
+          </span>
+          <span className="cursor-pointer" onClick={() => toggleCommentBox(ad._id)}>
+            💬 {ad.comments?.length || 0}
+          </span>
+        </div>
+      </div>
+
+      {/* Tags */}
+      <p className="text-sm text-blue-600 mb-1 break-words">
+        {ad.selectedTags?.map((tag) => `#${tag}`).join(" ")}
+      </p>
+
+      {/* Campaign Details */}
+      <p className="text-sm mb-2 break-words">{ad.campaignDetails}</p>
+
+      {/* Comment Box */}
+      {showCommentBox[ad._id] && (
+        <div className="mt-3 border-t pt-3 space-y-2">
+          {ad.comments?.map((comment) => (
+            <div key={comment._id} className="bg-gray-100 px-3 py-2 rounded text-sm">
+              <p className="text-gray-800">{comment.comment}</p>
+              <p className="text-xs text-gray-500">
+                {new Date(comment.createdAt).toLocaleString()}
+              </p>
             </div>
-            {/* Recent Ads Section with Grid Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recentAds.map((ad) => (
-                <div key={ad.id} className="bg-white p-4 rounded-lg shadow">
-                  <img
-                    src={ad.file}
-                    alt={ad.title}
-                    className="w-full h-40 object-cover rounded-lg mb-3"
-                  />
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center">
-                      <Avatar className="w-8 h-8 mr-2">
-                        {ad.avatar ? (
-                          <AvatarImage src={ad.avatar} alt={ad.username} />
-                        ) : (
-                          <AvatarFallback>{userPlaceholder(ad.username)}</AvatarFallback>
-                        )}
-                      </Avatar>
-                      <p className="font-semibold">{ad.username}</p>
-                    </div>
-                    <div className="flex space-x-2 text-sm text-gray-600">
-                      <span>❤️ {ad.likes.toLocaleString()}</span>
-                      <span>💬 {ad.comments}</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-blue-600 mb-1">{ad.hashtags}</p>
-                  <p className="text-sm">{ad.description}</p>
-                </div>
-              ))}
-            </div>
+          ))}
+
+          <input
+            type="text"
+            placeholder="Write a comment..."
+            value={commentText[ad._id] || ""}
+            onChange={(e) => handleCommentChange(ad._id, e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded text-sm"
+          />
+          <button
+            onClick={() => submitComment(ad._id)}
+            className="px-4 py-1 text-sm bg-blue-500 text-white rounded"
+          >
+            Submit
+          </button>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
+
           </div>
         </div>
       </main>
-      {selectedStory && (
-        <StoryPreview
-          file={selectedStory.file}
-          fileType={selectedStory.fileType}
-          onClose={handleClosePreview}
-          username={selectedStory.username}
-          avatar={selectedStory.avatar}
-        />
-      )}
+   {selectedIndex !== null && videoStories.length > 0 && videoStories[selectedIndex] && (
+  <StoryPreview
+    file={videoStories[selectedIndex].mediaUrl}
+    fileType="video"
+    onClose={() => setSelectedIndex(null)}
+    username={videoStories[selectedIndex].createdBy?.email || "Unknown"}
+    avatar={videoStories[selectedIndex].createdBy?.avatar || ""}
+    onNext={() =>
+      setSelectedIndex((prev) =>
+        prev < videoStories.length - 1 ? prev + 1 : prev
+      )
+    }
+    onPrevious={() =>
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev))
+    }
+  />
+)}
+
     </div>
   );
 };

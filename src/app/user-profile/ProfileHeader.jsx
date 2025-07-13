@@ -296,6 +296,10 @@ const ProfileHeader = ({
                     <Image
                       src={coverPhotoPreview}
                       alt="cover-photo"
+                  width={80}
+height={80}
+
+
                       className="w-full h-40 object-cover rounded-lg mb-4"
                     />
                   )}

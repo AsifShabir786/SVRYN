@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PaymentButton from "./PaymentButton";
+import { CiAt } from "react-icons/ci";
 
 import {
   Dialog,
@@ -39,6 +40,7 @@ const NewPostForm = ({ isPostFormOpen, setIsPostFormOpen, groups, pages }) => {
   const { handleCreatePost } = usePostStore();
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
+  console.log(selectedGroup,'selectedGroup_____')
   const [isFeatured, setIsFeatured] = useState(null);
   const [message1, setMessage1] = useState("");
   const [errMsg, setErrMsg] = useState("");
@@ -77,38 +79,54 @@ const NewPostForm = ({ isPostFormOpen, setIsPostFormOpen, groups, pages }) => {
     setFilePreview(URL.createObjectURL(file));
   };
 
-  const handlePost = async () => {
-    try {
-      if (isFeatured) {
-        if (message1 !== "✅ Payment Successful!") {
-          setErrMsg("Please make payment");
-          return;
-        }
+const handlePost = async () => {
+  try {
+    if (isFeatured) {
+      if (message1 !== "✅ Payment Successful!") {
+        setErrMsg("Please make payment");
+        return;
       }
-
-      setLoading(true);
-
-      const formData = new FormData();
-      formData.append("content", postContent);
-      formData.append("groupId", selectedGroup._id);
-      formData.append("groupName", selectedGroup.name);
-      formData.append("pages", pages);
-      formData.append("isFeatured", isFeatured ? "isFeatured" : "");
-
-      if (selectedFile) {
-        formData.append("media", selectedFile);
-      }
-      const result = await handleCreatePost(formData);
-      console.log(result);
-      setPostContent("");
-      setSelectedFile(null);
-      setFilePreview(null);
-      setIsPostFormOpen(false);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
     }
-  };
+
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("content", postContent);
+
+    if (selectedGroup?._id) {
+      formData.append("groupId", selectedGroup._id);
+    }
+
+    if (selectedGroup?.name) {
+      formData.append("groupName", selectedGroup.name);
+    }
+
+    if (pages && pages !== "undefined") {
+      formData.append("pages", pages);
+    }
+
+    if (isFeatured) {
+      formData.append("isFeatured", "isFeatured");
+    }
+
+    if (selectedFile) {
+      formData.append("media", selectedFile);
+    }
+
+    const result = await handleCreatePost(formData);
+    console.log(result);
+
+    // Reset states
+    setPostContent("");
+    setSelectedFile(null);
+    setFilePreview(null);
+    setIsPostFormOpen(false);
+    window.location.reload()
+  } catch (error) {
+    console.error(error);
+    setLoading(false);
+  }
+};
 
   return (
     <Card>
@@ -137,21 +155,23 @@ const NewPostForm = ({ isPostFormOpen, setIsPostFormOpen, groups, pages }) => {
                   className="cursor-pointer rounded-full h-12 dark:bg-[rgb(58,59,60)] placeholder:text-gray-500 dark:placeholder:text-gray-400"
                 />
                 <Separator className="my-2 dark:bg-slate-400" />
-                <div className="flex justify-between">
-                  {/* Replace Button components with styled divs */}
-                  <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground px-4 py-2 cursor-pointer">
-                    <ImageIcon className="h-5 w-5 text-green-500 mr-2" />
-                    <span className="dark:text-slate-100">Photo</span>
-                  </div>
-                  <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground px-4 py-2 cursor-pointer">
-                    <Video className="h-5 w-5 text-red-500 mr-2" />
-                    <span className="dark:text-slate-100">Video</span>
-                  </div>
-                  <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground px-4 py-2 cursor-pointer">
-                    <Laugh className="h-5 w-5 text-orange-500 mr-2" />
-                    <span className="dark:text-slate-100">Feelings</span>
-                  </div>
-                </div>
+               <div className="flex justify-center items-center gap-4">
+  {/* Photo/Video */}
+  <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground px-4 py-2 cursor-pointer">
+    <ImageIcon className="h-5 w-5 text-green-500 mr-2" />
+    <span className="dark:text-slate-100">Photo/Video</span>
+  </div>
+
+  {/* Divider */}
+<div className="w-0.5 h-6 bg-gray-400 dark:bg-gray-600" />
+
+  {/* Mentions */}
+  <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground px-4 py-2 cursor-pointer">
+    <CiAt className="h-5 w-5 text-orange-500 mr-2" />
+    <span className="dark:text-slate-100">Mentions</span>
+  </div>
+</div>
+
               </div>
             </DialogTrigger>
 
