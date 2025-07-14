@@ -43,10 +43,9 @@ export const logout = async () => {
   }
 };
 
-//check auth api
 export const checkUserAuth = async () => {
   try {
-    const token = localStorage.getItem('token'); // or sessionStorage depending on where you store it
+    const token = localStorage.getItem('token');
 
     const response = await axiosInstance.get("users/check-auth", {
       headers: {
@@ -64,3 +63,4 @@ export const checkUserAuth = async () => {
     return { isAuthenticated: false };
   }
 };
+
