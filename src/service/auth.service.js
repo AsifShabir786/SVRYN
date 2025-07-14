@@ -43,24 +43,17 @@ export const logout = async () => {
   }
 };
 
+//check auth api
 export const checkUserAuth = async () => {
   try {
-    const token = localStorage.getItem('token');
-
-    const response = await axiosInstance.get("users/check-auth", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+    const response = await axiosInstance.get("users/check-auth");
     if (response.data.status === "success") {
       return { isAuthenticated: true, user: response?.data?.data };
-    } else {
+    } else if (response.status === "error") {
       return { isAuthenticated: false };
     }
   } catch (error) {
-    console.log("checkUserAuth error:", error.response?.data || error.message);
+    console.log(error);
     return { isAuthenticated: false };
   }
 };
-
