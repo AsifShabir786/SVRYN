@@ -70,6 +70,11 @@ const Header = () => {
         router.push("/user-login");
         clearUser();
       }
+      localStorage.removeItem('user-login')
+      localStorage.removeItem('user-storage')
+      localStorage.removeItem('token')
+
+
       toast.success("user logged out successfully");
     } catch (error) {
       console.log(error);
