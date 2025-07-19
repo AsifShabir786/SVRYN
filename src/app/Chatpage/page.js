@@ -133,9 +133,11 @@ const Chatpage = () => {
   return (
  <div className="flex flex-col min-h-screen bg-background text-foreground">
   <main className="flex flex-1  ">
-    {/* Sidebar */}
+     
     <div className="hidden md:block">
-      {isSidebarOpen && <LeftSideBar />}
+      {/* {isSidebarOpen && */}
+       <LeftSideBar />
+      {/* //  } */}
     </div>
 
     {/* Page Content */}
