@@ -1,73 +1,72 @@
+// src/app/auth-wrapper.js
 'use client'
-import Loader from "@/lib/Loader";
-import { checkUserAuth, logout } from "@/service/auth.service";
-import userStore from "@/store/userStore";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import Header from "./components/Header";
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import Loader from '@/lib/Loader'
+import { checkUserAuth, logout } from '@/service/auth.service'
+import userStore from '@/store/userStore'
+import Header from './components/Header'
 
 export default function AuthWrapper({ children }) {
-  const { setUser, clearUser } = userStore();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter()
+  const pathname = usePathname()
+  const { setUser, clearUser } = userStore()
 
-  const publicRoutes = ['/user-login', '/ForgetPassword', '/Resetpassword']; // Add /Resetpassword to public routes
+  const [loading, setLoading] = useState(true)
+  const [authed, setAuthed] = useState(false)
 
-  // Check if the current pathname (without query parameters) is in publicRoutes
-  const isPublicPage = publicRoutes.includes(pathname);
+  // pages that anyone can hit
+  const publicRoutes = ['/user-login', '/ForgetPassword', '/Resetpassword']
+  const isPublicPage = publicRoutes.includes(pathname)
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const result = await checkUserAuth();
-        if (result.isAuthenticated) {
-          setUser(result?.user);
-          setIsAuthenticated(true);
-        } else {
-          await handleLogout();
-        }
-      } catch (error) {
-        console.error('authenticated failed', error);
-        await handleLogout();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const handleLogout = async () => {
-      clearUser();
-      setIsAuthenticated(false);
-      try {
-        await logout();
-      } catch (error) {
-        console.log('logout failed please try again later', error);
-      }
-      if (!isPublicPage) { // This condition remains the same as it checks if the page itself is public
-        router.push('/user-login');
-      }
-    };
-
-    if (!isPublicPage) {
-      checkAuth();
-    } else {
-      setLoading(false);
+    // if they’re _not_ on a public page and have no token → redirect:
+    const token = localStorage.getItem('token')
+    if (!isPublicPage && !token) {
+      router.replace('/user-login')
+      return
     }
-  }, [isPublicPage, router, setUser, clearUser]);
 
-  if (loading) {
-    return <Loader />;
-  }
+    // if they're on login but _do_ have a token → bounce home:
+    if (isPublicPage && token) {
+      router.replace('/')
+      return
+    }
 
-  if (!isAuthenticated && !isPublicPage) {
-    return <Loader />;
-  }
+    // if it's a protected page and they _do_ have a token, verify it:
+    if (!isPublicPage && token) {
+      checkUserAuth()
+        .then(res => {
+          if (res.isAuthenticated) {
+            setUser(res.user)
+            setAuthed(true)
+          } else {
+            throw new Error()
+          }
+        })
+        .catch(async () => {
+          clearUser()
+          await logout()
+          router.replace('/user-login')
+        })
+        .finally(() => setLoading(false))
+      return
+    }
 
+    // public page with no token — just show it
+    setLoading(false)
+  }, [pathname, router, setUser, clearUser, isPublicPage])
+
+  // show loader while redirecting or verifying
+  if (loading) return <Loader />
+
+  // at this point, either:
+  // • on a public page, or
+  // • authenticated and on any page
   return (
     <>
-      {!isPublicPage && isAuthenticated && <Header />}
-      {(isAuthenticated || isPublicPage) && children}
+      {!isPublicPage && authed && <Header />}
+      {children}
     </>
-  );
+  )
 }
