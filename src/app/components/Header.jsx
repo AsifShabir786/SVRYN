@@ -66,10 +66,10 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       const result = await logout();
-      if (result?.status == "success") {
+      // if (result?.status == "success") {
         router.push("/user-login");
-        clearUser();
-      }
+        // clearUser();
+      // }
       localStorage.removeItem('user-login')
       localStorage.removeItem('user-storage')
       localStorage.removeItem('token')

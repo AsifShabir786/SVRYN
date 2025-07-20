@@ -58,7 +58,7 @@ const HomePage = () => {
     const fetchListings = async () => {
       try {
         const response = await fetch(
-          "http://localhost:9003/MarketPlace/marketplace"
+          "https://fb-backend.vercel.app/MarketPlace/marketplace"
         );
         const data = await response.json();
         console.log("Fetched posts:___12", data.data);
